@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * entradas a la red: <br> 1- puntaje total del enemigo. <br> 2- puntaje total del jugador actual. <br> 3- cantidad de veces tirados el dado en este
  * turno. <br>
- *
  **/
 public
 class Pig
@@ -19,7 +18,7 @@ class Pig
 
     public static
     void main( String[] args ) {
-        System.out.println("Hello World!");
+        System.out.println("Hola Jugamos al Pig!!!");
     }
 
     @Override
