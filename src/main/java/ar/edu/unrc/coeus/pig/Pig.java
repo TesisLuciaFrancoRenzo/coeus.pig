@@ -18,7 +18,6 @@ import java.util.List;
  * 3- cantidad de veces tirados el dado en este turno.
  * <p>
  * 4- turno en el que estas.
- * <p>
  **/
 public
 class Pig
