@@ -7,12 +7,12 @@ enum Action
         implements IAction {
 
     /**
-     * Cero
+     * Tirar el dado.
      */
-    CERO,
+    THROW,
     /**
-     * Uno
+     * Paso, no tiro el dado.
      */
-    UNO
+    SKIP
 }
 
