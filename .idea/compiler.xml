@@ -8,6 +8,14 @@
       <module name="coeus.xor_test" target="1.8" />
       <module name="coeus_main" target="1.8" />
       <module name="coeus_test" target="1.8" />
+      <module name="IdeaProjects-coeus.pig_main" target="1.8" />
+      <module name="IdeaProjects-coeus.pig_main~1" target="1.8" />
+      <module name="IdeaProjects-coeus.pig_test" target="1.8" />
+      <module name="IdeaProjects-coeus.pig_test~1" target="1.8" />
+      <module name="IdeaProjects-coeus_main" target="1.8" />
+      <module name="IdeaProjects-coeus_main~1" target="1.8" />
+      <module name="IdeaProjects-coeus_test" target="1.8" />
+      <module name="IdeaProjects-coeus_test~1" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

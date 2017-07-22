@@ -1,4 +1,4 @@
-package ar.edu.unrc.coeus.xor;
+package ar.edu.unrc.coeus.pig;
 
 import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IStateNTuple;

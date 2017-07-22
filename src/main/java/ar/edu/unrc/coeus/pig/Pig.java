@@ -1,4 +1,4 @@
-package ar.edu.unrc.coeus.xor;
+package ar.edu.unrc.coeus.pig;
 
 import ar.edu.unrc.coeus.tdlearning.interfaces.IAction;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IActor;
@@ -7,8 +7,14 @@ import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
 
 import java.util.List;
 
+
+/**
+ * entradas ala red:
+ * <p>
+ * 1- puntaje total del enemigo 2- puntaje total del jugador actual 3- cantidad de veces tirados el dado en este turno 4- turno en el que estas
+ **/
 public
-class Xor
+class Pig
         implements IProblemToTrain {
 
     public static
