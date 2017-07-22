@@ -1,4 +1,4 @@
-rootProject.name = 'coeus.xor'
+rootProject.name = 'coeus.pig'
 
 if (file("../coeus").exists()) {
     includeBuild "../coeus"
