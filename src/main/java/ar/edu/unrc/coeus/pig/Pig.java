@@ -11,7 +11,14 @@ import java.util.List;
 /**
  * entradas ala red:
  * <p>
- * 1- puntaje total del enemigo 2- puntaje total del jugador actual 3- cantidad de veces tirados el dado en este turno 4- turno en el que estas
+ * 1- puntaje total del enemigo.
+ * <p>
+ * 2- puntaje total del jugador actual.
+ * <p>
+ * 3- cantidad de veces tirados el dado en este turno.
+ * <p>
+ * 4- turno en el que estas.
+ * <p>
  **/
 public
 class Pig
