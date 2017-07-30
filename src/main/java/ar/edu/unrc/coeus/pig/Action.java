@@ -25,13 +25,15 @@ public
 enum Action
         implements IAction {
 
-    /**
-     * Tirar el dado.
-     */
-    THROW,
-    /**
-     * Paso, no tiro el dado.
-     */
-    SKIP
+    ROLL1DICE,
+    ROLL2DICE,
+    ROLL3DICE,
+    ROLL4DICE,
+    ROLL5DICE,
+    ROLL6DICE,
+    ROLL7DICE,
+    ROLL8DICE,
+    ROLL9DICE,
+    ROLL10DICE,
 }
 
