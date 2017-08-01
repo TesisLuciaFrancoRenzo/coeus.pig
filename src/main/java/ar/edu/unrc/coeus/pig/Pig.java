@@ -38,6 +38,8 @@ public
 class Pig
         implements IProblemToTrain {
 
+    private final Random random = new Random();
+
     public static final List< IAction > listOfAllPossibleActions = Arrays.asList(Action.ROLL1DICE,
             Action.ROLL2DICES,
             Action.ROLL3DICES,
@@ -48,7 +50,7 @@ class Pig
             Action.ROLL8DICES,
             Action.ROLL9DICES,
             Action.ROLL10DICES);
-    private final State currentState;
+    private State currentState;
 
     public
     Pig() {
@@ -132,6 +134,12 @@ class Pig
     @Override
     public
     IState computeNextTurnStateFromAfterState( final IState afterState ) {
+
+        if ( currentState.isPlayer1() ) {
+            currentState.addPlayer1Score(rollDices(currentState.getDicesToRoll(), random, false));
+        } else {
+            currentState.addPlayer2Score(rollDices(currentState.getDicesToRoll(), random, false));
+        }
         return null;
     }
 
@@ -153,6 +161,17 @@ class Pig
     public
     Object[] evaluateStateWithPerceptron( final IState state ) {
         return new Object[0];
+    }
+
+    public
+    State getCurrentState() {
+        return currentState;
+    }
+
+    @Override
+    public
+    void setCurrentState( final IState nextTurnState ) {
+        currentState = (State) nextTurnState;
     }
 
     @Override
@@ -211,11 +230,5 @@ class Pig
     public
     void reset() {
         currentState.reset();
-    }
-
-    @Override
-    public
-    void setCurrentState( final IState nextTurnState ) {
-
     }
 }
