@@ -2,6 +2,14 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="coeus.game2048.visual_android" target="1.8" />
+      <module name="coeus.game2048.visual_desktop" target="1.8" />
+      <module name="coeus.game2048.visual_embedded" target="1.8" />
+      <module name="coeus.game2048.visual_ios" target="1.8" />
+      <module name="coeus.game2048.visual_main" target="1.8" />
+      <module name="coeus.game2048.visual_test" target="1.8" />
+      <module name="coeus.game2048_main" target="1.8" />
+      <module name="coeus.game2048_test" target="1.8" />
       <module name="coeus.pig_main" target="1.8" />
       <module name="coeus.pig_test" target="1.8" />
       <module name="coeus.xor_main" target="1.8" />

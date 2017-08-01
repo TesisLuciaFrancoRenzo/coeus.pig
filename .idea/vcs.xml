@@ -2,6 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/../coeus" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../coeus.game2048" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../coeus.game2048.visual" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
 </project>

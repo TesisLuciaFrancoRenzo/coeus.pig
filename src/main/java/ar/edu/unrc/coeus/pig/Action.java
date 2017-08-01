@@ -24,16 +24,26 @@ import ar.edu.unrc.coeus.tdlearning.interfaces.IAction;
 public
 enum Action
         implements IAction {
+    ROLL1DICE(1),
+    ROLL2DICES(2),
+    ROLL3DICES(3),
+    ROLL4DICES(4),
+    ROLL5DICES(5),
+    ROLL6DICES(6),
+    ROLL7DICES(7),
+    ROLL8DICES(8),
+    ROLL9DICES(9),
+    ROLL10DICES(10);
 
-    ROLL1DICE,
-    ROLL2DICES,
-    ROLL3DICES,
-    ROLL4DICES,
-    ROLL5DICES,
-    ROLL6DICES,
-    ROLL7DICES,
-    ROLL8DICES,
-    ROLL9DICES,
-    ROLL10DICES,
+    private int numVal;
+
+    Action( int numVal ) {
+        this.numVal = numVal;
+    }
+
+    public
+    int getNumVal() {
+        return numVal;
+    }
 }
 

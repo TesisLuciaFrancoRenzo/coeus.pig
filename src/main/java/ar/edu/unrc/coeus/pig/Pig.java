@@ -26,6 +26,7 @@ import ar.edu.unrc.coeus.tdlearning.learning.TDLambdaLearning;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -37,41 +38,28 @@ public
 class Pig
         implements IProblemToTrain {
 
+    public static final List< IAction > listOfAllPossibleActions = Arrays.asList(Action.ROLL1DICE,
+            Action.ROLL2DICES,
+            Action.ROLL3DICES,
+            Action.ROLL4DICES,
+            Action.ROLL5DICES,
+            Action.ROLL6DICES,
+            Action.ROLL7DICES,
+            Action.ROLL8DICES,
+            Action.ROLL9DICES,
+            Action.ROLL10DICES);
+    private final State currentState;
+
+    public
+    Pig() {
+        currentState = new State();
+    }
+
     public static
     void main( final String[] args ) {
         if ( args[0].contains("humans") ) {
-            System.out.println("Hola Jugamos al Pig!!! Humano vs Humano");
-            final State  currentState = new State();
-            final Random random       = new Random();
-            random.setSeed(System.currentTimeMillis());
-            while ( !currentState.isTerminalState() ) {
-                if ( currentState.isPlayer1() ) {
-                    System.out.println("======== Turno del jugador 1 ========");
-                } else {
-                    System.out.println("======== Turno del jugador 2 ========");
-                }
-                System.out.println("¿Cuántos dados desea tirar (1 a 10)?");
-                // entrada del jugador
-                currentState.setDicesToRoll(userInput());
-                if ( currentState.isPlayer1() ) {
-                    currentState.addPlayer1Score(rollDices(currentState.getDicesToRoll(), random, true));
-                    System.out.println("* Puntaje Total = " + currentState.getPlayer1Score() + " *");
-                } else {
-                    currentState.addPlayer2Score(rollDices(currentState.getDicesToRoll(), random, true));
-                    System.out.println("* Puntaje Total = " + currentState.getPlayer2Score() + " *");
-                }
-
-                // cambiamos de jugador si no se gana el juego
-                if ( !currentState.isTerminalState() ) {
-                    currentState.swapPlayers();
-                }
-            }
-            System.out.println("==========================================");
-            if ( currentState.isPlayer1() ) {
-                System.out.println("Gana el jugador 1 con " + currentState.getPlayer1Score() + " puntos");
-            } else {
-                System.out.println("Gana el jugador 2 con " + currentState.getPlayer2Score() + " puntos");
-            }
+            final Pig pig = new Pig();
+            pig.playHumanVsHuman();
         }
     }
 
@@ -105,6 +93,9 @@ class Pig
         return total;
     }
 
+    /**
+     * @return entero del 1 al 10 introducido por teclado.
+     */
     private static
     int userInput() {
         while ( true ) {
@@ -131,7 +122,11 @@ class Pig
             final IState turnInitialState,
             final IAction action
     ) {
-        return null;
+        //copiamos el estado inicial para calcular el after state.
+        State newState = (State) turnInitialState.getCopy();
+        //nuestro partial score es la cantidad de dados arrojados en el turno.
+        newState.setDicesToRoll(( (Action) action ).getNumVal());
+        return newState;
     }
 
     @Override
@@ -169,13 +164,53 @@ class Pig
     @Override
     public
     List< IAction > listAllPossibleActions( final IState turnInitialState ) {
-        return null;
+        return listOfAllPossibleActions;
     }
 
     @Override
     public
     double normalizeValueToPerceptronOutput( final Object value ) {
         return (double) 0;
+    }
+
+    private
+    void playHumanVsHuman() {
+        System.out.println("Hola Jugamos al Pig!!! Humano vs Humano");
+        final Random random = new Random();
+        random.setSeed(System.currentTimeMillis());
+        while ( !currentState.isTerminalState() ) {
+            if ( currentState.isPlayer1() ) {
+                System.out.println("======== Turno del jugador 1 ========");
+            } else {
+                System.out.println("======== Turno del jugador 2 ========");
+            }
+            System.out.println("¿Cuántos dados desea tirar (1 a 10)?");
+            // entrada del jugador
+            currentState.setDicesToRoll(userInput());
+            if ( currentState.isPlayer1() ) {
+                currentState.addPlayer1Score(rollDices(currentState.getDicesToRoll(), random, true));
+                System.out.println("* Puntaje Total = " + currentState.getPlayer1Score() + " *");
+            } else {
+                currentState.addPlayer2Score(rollDices(currentState.getDicesToRoll(), random, true));
+                System.out.println("* Puntaje Total = " + currentState.getPlayer2Score() + " *");
+            }
+
+            // cambiamos de jugador si no se gana el juego
+            if ( !currentState.isTerminalState() ) {
+                currentState.swapPlayers();
+            }
+        }
+        System.out.println("==========================================");
+        if ( currentState.isPlayer1() ) {
+            System.out.println("Gana el jugador 1 con " + currentState.getPlayer1Score() + " puntos");
+        } else {
+            System.out.println("Gana el jugador 2 con " + currentState.getPlayer2Score() + " puntos");
+        }
+    }
+
+    public
+    void reset() {
+        currentState.reset();
     }
 
     @Override

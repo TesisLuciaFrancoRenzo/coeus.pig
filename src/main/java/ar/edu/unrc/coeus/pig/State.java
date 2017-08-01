@@ -25,7 +25,7 @@ import ar.edu.unrc.coeus.tdlearning.interfaces.IStatePerceptron;
 /**
  *
  */
-public
+public final
 class State
         implements IStatePerceptron {
 
@@ -36,10 +36,7 @@ class State
 
     public
     State() {
-        dicesToRoll = 0;
-        isPlayer1 = true;
-        player1Score = 0;
-        player2Score = 0;
+        reset();
     }
 
     public
@@ -87,24 +84,14 @@ class State
     }
 
     public
-    void setPlayer1Score( final int player1Score ) {
-        this.player1Score = player1Score;
-    }
-
-    public
     int getPlayer2Score() {
         return player2Score;
-    }
-
-    public
-    void setPlayer2Score( final int player2Score ) {
-        this.player2Score = player2Score;
     }
 
     @Override
     public
     double getStateReward( final int outputNeuron ) {
-        return (double) 0;
+        return (double) dicesToRoll;
     }
 
     public
@@ -112,15 +99,18 @@ class State
         return isPlayer1;
     }
 
-    public
-    void setPlayer1( final boolean player1 ) {
-        isPlayer1 = player1;
-    }
-
     @Override
     public
     boolean isTerminalState() {
         return ( player1Score >= 100 ) || ( player2Score >= 100 );
+    }
+
+    public
+    void reset() {
+        dicesToRoll = 0;
+        isPlayer1 = true;
+        player1Score = 0;
+        player2Score = 0;
     }
 
     public
