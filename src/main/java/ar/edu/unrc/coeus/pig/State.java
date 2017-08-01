@@ -29,32 +29,115 @@ public
 class State
         implements IStatePerceptron {
 
-    private int     diceToRoll;
+    private int     dicesToRoll;
     private boolean isPlayer1;
     private int     player1Score;
     private int     player2Score;
 
-    @Override
     public
-    IState getCopy() {
-        return null;
+    State() {
+        dicesToRoll = 0;
+        isPlayer1 = true;
+        player1Score = 0;
+        player2Score = 0;
+    }
+
+    public
+    State(
+            final int dicesToRoll,
+            final boolean isPlayer1,
+            final int player1Score,
+            final int player2Score
+    ) {
+        this.dicesToRoll = dicesToRoll;
+        this.isPlayer1 = isPlayer1;
+        this.player1Score = player1Score;
+        this.player2Score = player2Score;
+    }
+
+    public
+    void addPlayer1Score( final int score ) {
+        player1Score += score;
+    }
+
+    public
+    void addPlayer2Score( final int score ) {
+        player2Score += score;
     }
 
     @Override
     public
-    double getStateReward( int outputNeuron ) {
-        return 0;
+    IState getCopy() {
+        return new State(dicesToRoll, isPlayer1, player1Score, player2Score);
+    }
+
+    public
+    int getDicesToRoll() {
+        return dicesToRoll;
+    }
+
+    public
+    void setDicesToRoll( final int dicesToRoll ) {
+        this.dicesToRoll = dicesToRoll;
+    }
+
+    public
+    int getPlayer1Score() {
+        return player1Score;
+    }
+
+    public
+    void setPlayer1Score( final int player1Score ) {
+        this.player1Score = player1Score;
+    }
+
+    public
+    int getPlayer2Score() {
+        return player2Score;
+    }
+
+    public
+    void setPlayer2Score( final int player2Score ) {
+        this.player2Score = player2Score;
+    }
+
+    @Override
+    public
+    double getStateReward( final int outputNeuron ) {
+        return (double) 0;
+    }
+
+    public
+    boolean isPlayer1() {
+        return isPlayer1;
+    }
+
+    public
+    void setPlayer1( final boolean player1 ) {
+        isPlayer1 = player1;
     }
 
     @Override
     public
     boolean isTerminalState() {
-        return false;
+        return ( player1Score >= 100 ) || ( player2Score >= 100 );
+    }
+
+    public
+    void swapPlayers() {
+        isPlayer1 = !isPlayer1;
     }
 
     @Override
     public
-    Double translateToPerceptronInput( int neuronIndex ) {
+    String toString() {
+        return "State{" + "dicesToRoll=" + dicesToRoll + ", isPlayer1=" + isPlayer1 + ", player1Score=" + player1Score + ", player2Score=" +
+               player2Score + '}';
+    }
+
+    @Override
+    public
+    Double translateToPerceptronInput( final int neuronIndex ) {
         return null;
     }
 }

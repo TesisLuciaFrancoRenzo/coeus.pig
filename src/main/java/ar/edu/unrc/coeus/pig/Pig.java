@@ -23,67 +23,142 @@ import ar.edu.unrc.coeus.tdlearning.interfaces.IAction;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IActor;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IProblemToTrain;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
+import ar.edu.unrc.coeus.tdlearning.learning.TDLambdaLearning;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Random;
 
 
 /**
- * Entradas a la red: <br> 1- puntaje total del enemigo (Máximo 105). <br> 2- puntaje total del jugador actual (Máximo 105). <br> 3- cantidad de veces
- * tirados el dado en este turno (En el peor caso se lanza 50 veces el dado, con un valor de 2 puntos). <br> 4- Puntaje acumulado en el turno
- * actual (Máximo 105). <br>Objetivo: el que anote 100 o más puntos gana.<br> Detalles:<br> Haga que los jugadores lancen el dado para determinar el
- * orden de juego. El puntaje más bajo va primero.<br> El primer jugador tira el dado y suma los números después de cada tirada. Pueden dejar de tirar
- * en cualquier momento y terminar el turno.<br> El jugador pierde todos los puntos del turno cuando se tira un 1.<br> Si el primer jugador llega a
- * 100 puntos en su primer turno, el otro jugador (s) puede tomar su turno para tratar de lograr una mejor puntuación.<br>
+ *
  **/
 public
 class Pig
         implements IProblemToTrain {
 
     public static
-    void main( String[] args ) {
+    void main( final String[] args ) {
+        if ( args[0].contains("humans") ) {
+            System.out.println("Hola Jugamos al Pig!!! Humano vs Humano");
+            final State  currentState = new State();
+            final Random random       = new Random();
+            random.setSeed(System.currentTimeMillis());
+            while ( !currentState.isTerminalState() ) {
+                if ( currentState.isPlayer1() ) {
+                    System.out.println("======== Turno del jugador 1 ========");
+                } else {
+                    System.out.println("======== Turno del jugador 2 ========");
+                }
+                System.out.println("¿Cuántos dados desea tirar (1 a 10)?");
+                // entrada del jugador
+                currentState.setDicesToRoll(userInput());
+                if ( currentState.isPlayer1() ) {
+                    currentState.addPlayer1Score(rollDices(currentState.getDicesToRoll(), random, true));
+                    System.out.println("* Puntaje Total = " + currentState.getPlayer1Score() + " *");
+                } else {
+                    currentState.addPlayer2Score(rollDices(currentState.getDicesToRoll(), random, true));
+                    System.out.println("* Puntaje Total = " + currentState.getPlayer2Score() + " *");
+                }
 
-        System.out.println("Hola Jugamos al Pig!!!");
+                // cambiamos de jugador si no se gana el juego
+                if ( !currentState.isTerminalState() ) {
+                    currentState.swapPlayers();
+                }
+            }
+            System.out.println("==========================================");
+            if ( currentState.isPlayer1() ) {
+                System.out.println("Gana el jugador 1 con " + currentState.getPlayer1Score() + " puntos");
+            } else {
+                System.out.println("Gana el jugador 2 con " + currentState.getPlayer2Score() + " puntos");
+            }
+        }
+    }
+
+    private static
+    int rollDices(
+            final int dicesToRoll,
+            final Random random,
+            final boolean show
+    ) {
+        if ( show ) {
+            System.out.printf("Tiradas = ");
+        }
+        int total = 0;
+        for ( int i = 0; i < dicesToRoll; i++ ) {
+            final int diceValue = TDLambdaLearning.randomBetween(1, 10, random);
+            if ( show ) {
+                System.out.print(diceValue + ", ");
+            }
+            total += diceValue;
+            if ( diceValue == 1 ) {
+                if ( show ) {
+                    System.out.println();
+                }
+                return 0;
+            }
+        }
+        if ( show ) {
+            System.out.println();
+            System.out.println("Resultados de la tirada: " + total);
+        }
+        return total;
+    }
+
+    private static
+    int userInput() {
+        while ( true ) {
+            try ( BufferedReader br = new BufferedReader(new InputStreamReader(System.in)) ) {
+                final String s     = br.readLine();
+                final int    value = Integer.parseInt(s);
+                if ( ( value < 1 ) || ( value > 10 ) ) {throw new Exception("Incorrect input value");}
+                return value;
+            } catch ( Exception e ) {
+                System.out.println("Error: Debe introducir un numero del 1 al 10");
+            }
+        }
     }
 
     @Override
     public
-    boolean canExploreThisTurn( long currentTurn ) {
+    boolean canExploreThisTurn( final long currentTurn ) {
         return false;
     }
 
     @Override
     public
     IState computeAfterState(
-            IState turnInitialState,
-            IAction action
+            final IState turnInitialState,
+            final IAction action
     ) {
         return null;
     }
 
     @Override
     public
-    IState computeNextTurnStateFromAfterState( IState afterState ) {
+    IState computeNextTurnStateFromAfterState( final IState afterState ) {
         return null;
     }
 
     @Override
     public
     Double computeNumericRepresentationFor(
-            Object[] output,
-            IActor actor
+            final Object[] output,
+            final IActor actor
     ) {
         return null;
     }
 
     @Override
     public
-    double deNormalizeValueFromPerceptronOutput( Object value ) {
-        return 0;
+    double deNormalizeValueFromPerceptronOutput( final Object value ) {
+        return (double) 0;
     }
 
     @Override
     public
-    Object[] evaluateBoardWithPerceptron( IState state ) {
+    Object[] evaluateBoardWithPerceptron( final IState state ) {
         return new Object[0];
     }
 
@@ -95,25 +170,25 @@ class Pig
 
     @Override
     public
-    IState initialize( IActor actor ) {
+    IState initialize( final IActor actor ) {
         return null;
     }
 
     @Override
     public
-    List< IAction > listAllPossibleActions( IState turnInitialState ) {
+    List< IAction > listAllPossibleActions( final IState turnInitialState ) {
         return null;
     }
 
     @Override
     public
-    double normalizeValueToPerceptronOutput( Object value ) {
-        return 0;
+    double normalizeValueToPerceptronOutput( final Object value ) {
+        return (double) 0;
     }
 
     @Override
     public
-    void setCurrentState( IState nextTurnState ) {
+    void setCurrentState( final IState nextTurnState ) {
 
     }
 }
