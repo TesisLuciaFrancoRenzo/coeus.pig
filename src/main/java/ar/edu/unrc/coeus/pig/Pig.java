@@ -158,7 +158,7 @@ class Pig
 
     @Override
     public
-    Object[] evaluateBoardWithPerceptron( final IState state ) {
+    Object[] evaluateStateWithPerceptron( final IState state ) {
         return new Object[0];
     }
 
