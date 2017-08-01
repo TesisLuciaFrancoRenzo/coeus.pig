@@ -20,7 +20,6 @@
 package ar.edu.unrc.coeus.pig;
 
 import ar.edu.unrc.coeus.tdlearning.interfaces.IAction;
-import ar.edu.unrc.coeus.tdlearning.interfaces.IActor;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IProblemToTrain;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
 import ar.edu.unrc.coeus.tdlearning.learning.TDLambdaLearning;
@@ -144,8 +143,7 @@ class Pig
     @Override
     public
     Double computeNumericRepresentationFor(
-            final Object[] output,
-            final IActor actor
+            final Object[] output
     ) {
         return null;
     }
@@ -164,13 +162,7 @@ class Pig
 
     @Override
     public
-    IActor getActorToTrain() {
-        return null;
-    }
-
-    @Override
-    public
-    IState initialize( final IActor actor ) {
+    IState initialize() {
         return null;
     }
 
