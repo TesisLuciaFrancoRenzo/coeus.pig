@@ -30,7 +30,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 
 /**
@@ -49,10 +49,10 @@ class Pig
             Action.ROLL8DICES,
             Action.ROLL9DICES,
             Action.ROLL10DICES);
-    private State               currentState;
-    private Supplier< Integer > player1Brain;
-    private Supplier< Integer > player2Brain;
-    private Random              random;
+    private State                      currentState;
+    private Function< State, Integer > player1Brain;
+    private Function< State, Integer > player2Brain;
+    private Random                     random;
 
     public
     Pig(
@@ -61,23 +61,35 @@ class Pig
     ) {
         random = new Random();
         currentState = new State();
-        player1Brain = setBrainToPlayer(player1Type);
-        player2Brain = setBrainToPlayer(player2Type);
+        player1Brain = setPlayerType(player1Type);
+        player2Brain = setPlayerType(player2Type);
     }
 
     public static
     void main( final String[] args ) {
         if ( args[0].contains("Humans") ) {
             final Pig pig = new Pig(PlayerType.HUMAN, PlayerType.HUMAN);
-            pig.playHuman();
+            pig.play(true);
         } else if ( args[0].contains("HumanVsRandom") ) {
-            final Pig pig = new Pig(PlayerType.HUMAN, PlayerType.RANDOM);
-            pig.playHuman();
+            int humanPlayer = Integer.parseInt(args[1]);
+            Pig pig;
+            switch ( humanPlayer ) {
+                case 1:
+                    pig = new Pig(PlayerType.HUMAN, PlayerType.RANDOM);
+                    break;
+                case 2:
+                    pig = new Pig(PlayerType.RANDOM, PlayerType.HUMAN);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown human player position. Usage: ./pig HumanVsRandom (1|2)");
+            }
+            pig.play(true);
         } else if ( args[0].contains("TrainRandom") ) {
             final Pig pig1 = new Pig(PlayerType.PERCEPTRON, PlayerType.RANDOM);
             pig1.train();
             final Pig pig2 = new Pig(PlayerType.RANDOM, PlayerType.PERCEPTRON);
             pig2.train();
+            //TODO continuar!
         }
     }
 
@@ -173,14 +185,18 @@ class Pig
             finalState.addPlayer1Score(rollDices(finalState.getDicesToRoll(), random, false));
             if ( !finalState.isTerminalState() ) {
                 //acciones del jugador 2, consideradas como acciones estocásticas del jugador 1
-                finalState.addPlayer2Score(rollDices(player1Brain.get(), random, false));
+                finalState.swapPlayers();
+                finalState.addPlayer2Score(rollDices(player1Brain.apply(finalState), random, false));
+                finalState.swapPlayers();
             }
         } else {
             //acciones estocásticas del jugador 2
             finalState.addPlayer2Score(rollDices(finalState.getDicesToRoll(), random, false));
             if ( !finalState.isTerminalState() ) {
                 //acciones del jugador 1, consideradas como acciones estocásticas del jugador 2
-                finalState.addPlayer1Score(rollDices(player1Brain.get(), random, false));
+                finalState.swapPlayers();
+                finalState.addPlayer1Score(rollDices(player1Brain.apply(finalState), random, false));
+                finalState.swapPlayers();
             }
         }
         return finalState;
@@ -237,30 +253,35 @@ class Pig
     }
 
     private
-    void playHuman() {
+    void play( boolean show ) {
         System.out.println("Hola Jugamos al Pig!!!");
         final Random random = new Random();
         random.setSeed(System.currentTimeMillis());
         while ( !currentState.isTerminalState() ) {
-            if ( currentState.isPlayer1() ) {
-                System.out.println("======== Turno del jugador 1 ========");
-            } else {
-                System.out.println("======== Turno del jugador 2 ========");
+            if ( show ) {
+                if ( currentState.isPlayer1() ) {
+                    System.out.println("======== Turno del jugador 1 ========");
+                } else {
+                    System.out.println("======== Turno del jugador 2 ========");
+                }
+                System.out.println("¿Cuántos dados desea tirar (1 a 10)?: ");
             }
-            System.out.println("¿Cuántos dados desea tirar (1 a 10)?: ");
-
             if ( currentState.isPlayer1() ) {
                 // entrada del jugador 1
-                currentState.setDicesToRoll(player1Brain.get());
+                currentState.setDicesToRoll(player1Brain.apply(currentState));
                 // tiramos dados y calculamos puntaje
-                currentState.addPlayer1Score(rollDices(currentState.getDicesToRoll(), random, true));
-                System.out.println("* Puntaje Total = " + currentState.getPlayer1Score() + " *");
+                currentState.addPlayer1Score(rollDices(currentState.getDicesToRoll(), random, show));
+                if ( show ) {
+                    System.out.println("* Puntaje Total = " + currentState.getPlayer1Score() + " *");
+                }
             } else {
                 // entrada del jugador 2
-                currentState.setDicesToRoll(player2Brain.get());
+                currentState.setDicesToRoll(player2Brain.apply(currentState));
                 // tiramos dados y calculamos puntaje
-                currentState.addPlayer2Score(rollDices(currentState.getDicesToRoll(), random, true));
-                System.out.println("* Puntaje Total = " + currentState.getPlayer2Score() + " *");
+                currentState.addPlayer2Score(rollDices(currentState.getDicesToRoll(), random, show));
+                if ( show ) {
+                    System.out.println("* Puntaje Total = " + currentState.getPlayer2Score() + " *");
+                }
             }
 
             // cambiamos de jugador si no se gana el juego
@@ -268,23 +289,30 @@ class Pig
                 currentState.swapPlayers();
             }
         }
-        System.out.println("==========================================");
-        if ( currentState.isPlayer1() ) {
-            System.out.println("Gana el jugador 1 con " + currentState.getPlayer1Score() + " puntos");
-        } else {
-            System.out.println("Gana el jugador 2 con " + currentState.getPlayer2Score() + " puntos");
+        if ( show ) {
+            System.out.println("==========================================");
+            if ( currentState.isPlayer1() ) {
+                System.out.println("Gana el jugador 1 con " + currentState.getPlayer1Score() + " puntos");
+            } else {
+                System.out.println("Gana el jugador 2 con " + currentState.getPlayer2Score() + " puntos");
+            }
         }
     }
 
     private
-    Supplier< Integer > setBrainToPlayer( PlayerType player1Type ) {
-        switch ( player1Type ) {
+    Function< State, Integer > setPlayerType( PlayerType playerType ) {
+        switch ( playerType ) {
             case RANDOM:
-                return () -> TDLambdaLearning.randomBetween(1, 10, random);
+                return ( state ) -> TDLambdaLearning.randomBetween(1, 10, random);
             case HUMAN:
-                return () -> userInput();
+                return ( state ) -> userInput();
+            case GREEDY:
+                return ( state ) -> 10;
+            case PERCEPTRON:
+                //return (state) -> 10;
+                throw new UnsupportedOperationException("Not implemented yet");
             default:
-                return null;
+                throw new UnsupportedOperationException("Not implemented yet");
         }
     }
 
