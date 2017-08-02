@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 
 /**
@@ -37,10 +38,7 @@ import java.util.Random;
 public
 class Pig
         implements IProblemToTrain {
-
-    private final Random random = new Random();
-
-    public static final List< IAction > listOfAllPossibleActions = Arrays.asList(Action.ROLL1DICE,
+    private static final List< IAction > listOfAllPossibleActions = Arrays.asList(Action.ROLL1DICE,
             Action.ROLL2DICES,
             Action.ROLL3DICES,
             Action.ROLL4DICES,
@@ -50,21 +48,40 @@ class Pig
             Action.ROLL8DICES,
             Action.ROLL9DICES,
             Action.ROLL10DICES);
-    private State currentState;
+    private State               currentState;
+    private Supplier< Integer > opponentResultFunction;
+    private Random              random;
 
     public
-    Pig() {
+    Pig( OpponentType opponentType ) {
+        random = new Random();
         currentState = new State();
+        switch ( opponentType ) {
+            case RANDOM:
+                opponentResultFunction = () -> rollDices(TDLambdaLearning.randomBetween(1, 10, random), random, false);
+                break;
+            default:
+                opponentResultFunction = null;
+        }
     }
 
     public static
     void main( final String[] args ) {
         if ( args[0].contains("humans") ) {
-            final Pig pig = new Pig();
+            final Pig pig = new Pig(OpponentType.HUMAN);
             pig.playHumanVsHuman();
         }
     }
 
+    /**
+     * Tira los dados de 1 a {@code dicesToRoll} veces.
+     *
+     * @param dicesToRoll cantidad de dados a tirar.
+     * @param random      a utilizar para la generación de números al azar.
+     * @param show        true si debe mostrar por terminal los resultados.
+     *
+     * @return resultado de sumar todas las tiradas de dados, a excepción que se saque algún 1, lo cual retorna un puntaje de 0.
+     */
     private static
     int rollDices(
             final int dicesToRoll,
@@ -134,13 +151,24 @@ class Pig
     @Override
     public
     IState computeNextTurnStateFromAfterState( final IState afterState ) {
-
-        if ( currentState.isPlayer1() ) {
-            currentState.addPlayer1Score(rollDices(currentState.getDicesToRoll(), random, false));
+        final State finalState = (State) afterState.getCopy();
+        //Computamos todas las acciones estocásticas (incluyendo las del enemigo)
+        if ( finalState.isPlayer1() ) {
+            //acciones estocásticas del jugador 1
+            finalState.addPlayer1Score(rollDices(finalState.getDicesToRoll(), random, false));
+            if ( !finalState.isTerminalState() ) {
+                //acciones del jugador 2, consideradas como acciones estocásticas del jugador 1
+                finalState.addPlayer2Score(rollDices(opponentResultFunction.get(), random, false));
+            }
         } else {
-            currentState.addPlayer2Score(rollDices(currentState.getDicesToRoll(), random, false));
+            //acciones estocásticas del jugador 2
+            finalState.addPlayer2Score(rollDices(finalState.getDicesToRoll(), random, false));
+            if ( !finalState.isTerminalState() ) {
+                //acciones del jugador 1, consideradas como acciones estocásticas del jugador 2
+                finalState.addPlayer1Score(rollDices(opponentResultFunction.get(), random, false));
+            }
         }
-        return null;
+        return finalState;
     }
 
     @Override
@@ -177,7 +205,8 @@ class Pig
     @Override
     public
     IState initialize() {
-        return null;
+        currentState.reset();
+        return currentState;
     }
 
     @Override
@@ -228,7 +257,10 @@ class Pig
     }
 
     public
-    void reset() {
-        currentState.reset();
+    enum OpponentType {
+        HUMAN,
+        RANDOM,
+        GREEDY,
+        PERCEPTRON
     }
 }
