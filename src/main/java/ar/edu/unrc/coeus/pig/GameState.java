@@ -26,7 +26,7 @@ import ar.edu.unrc.coeus.tdlearning.interfaces.IStatePerceptron;
  *
  */
 public final
-class State
+class GameState
         implements IStatePerceptron {
 
     private int     dicesToRoll;
@@ -35,12 +35,12 @@ class State
     private int     player2Score;
 
     public
-    State() {
+    GameState() {
         reset();
     }
 
     public
-    State(
+    GameState(
             final int dicesToRoll,
             final boolean isPlayer1,
             final int player1Score,
@@ -65,7 +65,7 @@ class State
     @Override
     public
     IState getCopy() {
-        return new State(dicesToRoll, isPlayer1, player1Score, player2Score);
+        return new GameState(dicesToRoll, isPlayer1, player1Score, player2Score);
     }
 
     public
@@ -121,7 +121,7 @@ class State
     @Override
     public
     String toString() {
-        return "State{" + "dicesToRoll=" + dicesToRoll + ", isPlayer1=" + isPlayer1 + ", player1Score=" + player1Score + ", player2Score=" +
+        return "GameState{" + "dicesToRoll=" + dicesToRoll + ", isPlayer1=" + isPlayer1 + ", player1Score=" + player1Score + ", player2Score=" +
                player2Score + '}';
     }
 

@@ -49,10 +49,10 @@ class Game
             RollDicesAction.ROLL8DICES,
             RollDicesAction.ROLL9DICES,
             RollDicesAction.ROLL10DICES);
-    private final Function< State, Integer > player1Brain;
-    private final Function< State, Integer > player2Brain;
-    private final Random                     random;
-    private       State                      currentState;
+    private final Function< GameState, Integer > player1Brain;
+    private final Function< GameState, Integer > player2Brain;
+    private final Random                         random;
+    private       GameState                      currentGameState;
 
     public
     Game(
@@ -60,7 +60,7 @@ class Game
             final PlayerType player2Type
     ) {
         random = new Random();
-        currentState = new State();
+        currentGameState = new GameState();
         player1Brain = setPlayerType(player1Type);
         player2Brain = setPlayerType(player2Type);
     }
@@ -170,37 +170,37 @@ class Game
             final IAction action
     ) {
         //copiamos el estado inicial para calcular el after state.
-        final State newState = (State) turnInitialState.getCopy();
+        final GameState newGameState = (GameState) turnInitialState.getCopy();
         //nuestro partial score es la cantidad de dados arrojados en el turno.
-        newState.setDicesToRoll(( (RollDicesAction) action ).getNumVal());
-        return newState;
+        newGameState.setDicesToRoll(( (RollDicesAction) action ).getNumVal());
+        return newGameState;
     }
 
     @Override
     public
     IState computeNextTurnStateFromAfterState( final IState afterState ) {
-        final State finalState = (State) afterState.getCopy();
+        final GameState finalGameState = (GameState) afterState.getCopy();
         //Computamos todas las acciones estocásticas (incluyendo las del enemigo)
-        if ( finalState.isPlayer1() ) {
+        if ( finalGameState.isPlayer1() ) {
             //acciones estocásticas del jugador 1
-            finalState.addPlayer1Score(rollDices(finalState.getDicesToRoll(), random, false));
-            if ( !finalState.isTerminalState() ) {
+            finalGameState.addPlayer1Score(rollDices(finalGameState.getDicesToRoll(), random, false));
+            if ( !finalGameState.isTerminalState() ) {
                 //acciones del jugador 2, consideradas como acciones estocásticas del jugador 1
-                finalState.swapPlayers();
-                finalState.addPlayer2Score(rollDices(player1Brain.apply(finalState), random, false));
-                finalState.swapPlayers();
+                finalGameState.swapPlayers();
+                finalGameState.addPlayer2Score(rollDices(player1Brain.apply(finalGameState), random, false));
+                finalGameState.swapPlayers();
             }
         } else {
             //acciones estocásticas del jugador 2
-            finalState.addPlayer2Score(rollDices(finalState.getDicesToRoll(), random, false));
-            if ( !finalState.isTerminalState() ) {
+            finalGameState.addPlayer2Score(rollDices(finalGameState.getDicesToRoll(), random, false));
+            if ( !finalGameState.isTerminalState() ) {
                 //acciones del jugador 1, consideradas como acciones estocásticas del jugador 2
-                finalState.swapPlayers();
-                finalState.addPlayer1Score(rollDices(player1Brain.apply(finalState), random, false));
-                finalState.swapPlayers();
+                finalGameState.swapPlayers();
+                finalGameState.addPlayer1Score(rollDices(player1Brain.apply(finalGameState), random, false));
+                finalGameState.swapPlayers();
             }
         }
-        return finalState;
+        return finalGameState;
     }
 
     @Override
@@ -223,22 +223,11 @@ class Game
         return new Object[0];
     }
 
-    public
-    State getCurrentState() {
-        return currentState;
-    }
-
-    @Override
-    public
-    void setCurrentState( final IState nextTurnState ) {
-        currentState = (State) nextTurnState;
-    }
-
     @Override
     public
     IState initialize() {
-        currentState.reset();
-        return currentState;
+        currentGameState.reset();
+        return currentGameState;
     }
 
     @Override
@@ -258,57 +247,63 @@ class Game
         System.out.println("Hola Jugamos al Game!!!");
         final Random random = new Random();
         random.setSeed(System.currentTimeMillis());
-        while ( !currentState.isTerminalState() ) {
+        while ( !currentGameState.isTerminalState() ) {
             if ( show ) {
-                if ( currentState.isPlayer1() ) {
+                if ( currentGameState.isPlayer1() ) {
                     System.out.println("======== Turno del jugador 1 ========");
                 } else {
                     System.out.println("======== Turno del jugador 2 ========");
                 }
                 System.out.println("¿Cuántos dados desea tirar (1 a 10)?: ");
             }
-            if ( currentState.isPlayer1() ) {
+            if ( currentGameState.isPlayer1() ) {
                 // entrada del jugador 1
-                currentState.setDicesToRoll(player1Brain.apply(currentState));
+                currentGameState.setDicesToRoll(player1Brain.apply(currentGameState));
                 // tiramos dados y calculamos puntaje
-                currentState.addPlayer1Score(rollDices(currentState.getDicesToRoll(), random, show));
+                currentGameState.addPlayer1Score(rollDices(currentGameState.getDicesToRoll(), random, show));
                 if ( show ) {
-                    System.out.println("* Puntaje Total = " + currentState.getPlayer1Score() + " *");
+                    System.out.println("* Puntaje Total = " + currentGameState.getPlayer1Score() + " *");
                 }
             } else {
                 // entrada del jugador 2
-                currentState.setDicesToRoll(player2Brain.apply(currentState));
+                currentGameState.setDicesToRoll(player2Brain.apply(currentGameState));
                 // tiramos dados y calculamos puntaje
-                currentState.addPlayer2Score(rollDices(currentState.getDicesToRoll(), random, show));
+                currentGameState.addPlayer2Score(rollDices(currentGameState.getDicesToRoll(), random, show));
                 if ( show ) {
-                    System.out.println("* Puntaje Total = " + currentState.getPlayer2Score() + " *");
+                    System.out.println("* Puntaje Total = " + currentGameState.getPlayer2Score() + " *");
                 }
             }
 
             // cambiamos de jugador si no se gana el juego
-            if ( !currentState.isTerminalState() ) {
-                currentState.swapPlayers();
+            if ( !currentGameState.isTerminalState() ) {
+                currentGameState.swapPlayers();
             }
         }
         if ( show ) {
             System.out.println("==========================================");
-            if ( currentState.isPlayer1() ) {
-                System.out.println("Gana el jugador 1 con " + currentState.getPlayer1Score() + " puntos");
+            if ( currentGameState.isPlayer1() ) {
+                System.out.println("Gana el jugador 1 con " + currentGameState.getPlayer1Score() + " puntos");
             } else {
-                System.out.println("Gana el jugador 2 con " + currentState.getPlayer2Score() + " puntos");
+                System.out.println("Gana el jugador 2 con " + currentGameState.getPlayer2Score() + " puntos");
             }
         }
     }
 
+    @Override
+    public
+    void setCurrentState( final IState nextTurnState ) {
+        currentGameState = (GameState) nextTurnState;
+    }
+
     private
-    Function< State, Integer > setPlayerType( final PlayerType playerType ) {
+    Function< GameState, Integer > setPlayerType( final PlayerType playerType ) {
         switch ( playerType ) {
             case RANDOM:
-                return ( state ) -> TDLambdaLearning.randomBetween(1, 10, random);
+                return ( gameState ) -> TDLambdaLearning.randomBetween(1, 10, random);
             case HUMAN:
-                return ( state ) -> userInput();
+                return ( gameState ) -> userInput();
             case GREEDY:
-                return ( state ) -> 10;
+                return ( gameState ) -> 10;
             case PERCEPTRON:
                 //return (state) -> 10;
                 throw new UnsupportedOperationException("Not implemented yet");
