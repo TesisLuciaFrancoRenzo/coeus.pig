@@ -91,7 +91,7 @@ class State
     @Override
     public
     double getStateReward( final int outputNeuron ) {
-        return (double) dicesToRoll;
+        return dicesToRoll;
     }
 
     public

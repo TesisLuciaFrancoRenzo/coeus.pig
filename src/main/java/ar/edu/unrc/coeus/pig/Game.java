@@ -37,27 +37,27 @@ import java.util.function.Function;
  *
  **/
 public
-class Pig
+class Game
         implements IProblemToTrain {
-    private static final List< IAction > listOfAllPossibleActions = Arrays.asList(Action.ROLL1DICE,
-            Action.ROLL2DICES,
-            Action.ROLL3DICES,
-            Action.ROLL4DICES,
-            Action.ROLL5DICES,
-            Action.ROLL6DICES,
-            Action.ROLL7DICES,
-            Action.ROLL8DICES,
-            Action.ROLL9DICES,
-            Action.ROLL10DICES);
-    private State                      currentState;
-    private Function< State, Integer > player1Brain;
-    private Function< State, Integer > player2Brain;
-    private Random                     random;
+    private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS = Arrays.asList(RollDicesAction.ROLL1DICE,
+            RollDicesAction.ROLL2DICES,
+            RollDicesAction.ROLL3DICES,
+            RollDicesAction.ROLL4DICES,
+            RollDicesAction.ROLL5DICES,
+            RollDicesAction.ROLL6DICES,
+            RollDicesAction.ROLL7DICES,
+            RollDicesAction.ROLL8DICES,
+            RollDicesAction.ROLL9DICES,
+            RollDicesAction.ROLL10DICES);
+    private final Function< State, Integer > player1Brain;
+    private final Function< State, Integer > player2Brain;
+    private final Random                     random;
+    private       State                      currentState;
 
     public
-    Pig(
-            PlayerType player1Type,
-            PlayerType player2Type
+    Game(
+            final PlayerType player1Type,
+            final PlayerType player2Type
     ) {
         random = new Random();
         currentState = new State();
@@ -68,26 +68,26 @@ class Pig
     public static
     void main( final String[] args ) {
         if ( args[0].contains("Humans") ) {
-            final Pig pig = new Pig(PlayerType.HUMAN, PlayerType.HUMAN);
+            final Game pig = new Game(PlayerType.HUMAN, PlayerType.HUMAN);
             pig.play(true);
         } else if ( args[0].contains("HumanVsRandom") ) {
-            int humanPlayer = Integer.parseInt(args[1]);
-            Pig pig;
+            final int  humanPlayer = Integer.parseInt(args[1]);
+            final Game pig;
             switch ( humanPlayer ) {
                 case 1:
-                    pig = new Pig(PlayerType.HUMAN, PlayerType.RANDOM);
+                    pig = new Game(PlayerType.HUMAN, PlayerType.RANDOM);
                     break;
                 case 2:
-                    pig = new Pig(PlayerType.RANDOM, PlayerType.HUMAN);
+                    pig = new Game(PlayerType.RANDOM, PlayerType.HUMAN);
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown human player position. Usage: ./pig HumanVsRandom (1|2)");
             }
             pig.play(true);
         } else if ( args[0].contains("TrainRandom") ) {
-            final Pig pig1 = new Pig(PlayerType.PERCEPTRON, PlayerType.RANDOM);
+            final Game pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM);
             pig1.train();
-            final Pig pig2 = new Pig(PlayerType.RANDOM, PlayerType.PERCEPTRON);
+            final Game pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON);
             pig2.train();
             //TODO continuar!
         }
@@ -135,17 +135,18 @@ class Pig
     /**
      * @return entero del 1 al 10 introducido por teclado.
      */
+    @SuppressWarnings( "IOResourceOpenedButNotSafelyClosed" )
     private static
     int userInput() {
-        int value = 0;
+        int            value = 0;
+        BufferedReader br    = new BufferedReader(new InputStreamReader(System.in));
         while ( ( value < 1 ) || ( value > 10 ) ) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             try {
-                String s = br.readLine();
+                final String s = br.readLine();
                 value = Integer.parseInt(s);
-            } catch ( NumberFormatException e ) {
+            } catch ( final NumberFormatException ignored ) {
                 value = 0;
-            } catch ( IOException e ) {
+            } catch ( final IOException e ) {
                 e.printStackTrace();
                 value = 0;
             }
@@ -169,9 +170,9 @@ class Pig
             final IAction action
     ) {
         //copiamos el estado inicial para calcular el after state.
-        State newState = (State) turnInitialState.getCopy();
+        final State newState = (State) turnInitialState.getCopy();
         //nuestro partial score es la cantidad de dados arrojados en el turno.
-        newState.setDicesToRoll(( (Action) action ).getNumVal());
+        newState.setDicesToRoll(( (RollDicesAction) action ).getNumVal());
         return newState;
     }
 
@@ -213,7 +214,7 @@ class Pig
     @Override
     public
     double deNormalizeValueFromPerceptronOutput( final Object value ) {
-        return (double) 0;
+        return 0;
     }
 
     @Override
@@ -243,18 +244,18 @@ class Pig
     @Override
     public
     List< IAction > listAllPossibleActions( final IState turnInitialState ) {
-        return listOfAllPossibleActions;
+        return LIST_OF_ALL_POSSIBLE_ACTIONS;
     }
 
     @Override
     public
     double normalizeValueToPerceptronOutput( final Object value ) {
-        return (double) 0;
+        return 0;
     }
 
     private
-    void play( boolean show ) {
-        System.out.println("Hola Jugamos al Pig!!!");
+    void play( final boolean show ) {
+        System.out.println("Hola Jugamos al Game!!!");
         final Random random = new Random();
         random.setSeed(System.currentTimeMillis());
         while ( !currentState.isTerminalState() ) {
@@ -300,7 +301,7 @@ class Pig
     }
 
     private
-    Function< State, Integer > setPlayerType( PlayerType playerType ) {
+    Function< State, Integer > setPlayerType( final PlayerType playerType ) {
         switch ( playerType ) {
             case RANDOM:
                 return ( state ) -> TDLambdaLearning.randomBetween(1, 10, random);

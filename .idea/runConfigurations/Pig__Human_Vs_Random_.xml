@@ -6,7 +6,7 @@
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
-    <option name="MAIN_CLASS_NAME" value="ar.edu.unrc.coeus.pig.Pig" />
+    <option name="MAIN_CLASS_NAME" value="ar.edu.unrc.coeus.pig.Game" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="HumanVsRandom 1" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />

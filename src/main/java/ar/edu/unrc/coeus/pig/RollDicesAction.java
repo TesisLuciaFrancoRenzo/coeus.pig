@@ -22,7 +22,7 @@ package ar.edu.unrc.coeus.pig;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IAction;
 
 public
-enum Action
+enum RollDicesAction
         implements IAction {
     ROLL1DICE(1),
     ROLL2DICES(2),
@@ -35,9 +35,9 @@ enum Action
     ROLL9DICES(9),
     ROLL10DICES(10);
 
-    private int numVal;
+    private final int numVal;
 
-    Action( int numVal ) {
+    RollDicesAction( final int numVal ) {
         this.numVal = numVal;
     }
 

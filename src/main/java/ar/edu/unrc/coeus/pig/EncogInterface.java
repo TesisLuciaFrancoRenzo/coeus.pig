@@ -12,6 +12,7 @@ import org.encog.util.arrayutil.NormalizedField;
 import org.encog.util.obj.SerializeObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -32,14 +33,14 @@ class EncogInterface
 
     public
     EncogInterface(
-            ActivationFunction[] encogActivationFunctions,
-            double activationFunctionMax,
-            double activationFunctionMin,
-            boolean hasBias,
-            int[] neuronQuantityInLayer,
-            NormalizedField normInput,
-            NormalizedField normOutput,
-            BasicNetwork neuralNetwork
+            final ActivationFunction[] encogActivationFunctions,
+            final double activationFunctionMax,
+            final double activationFunctionMin,
+            final boolean hasBias,
+            final int[] neuronQuantityInLayer,
+            final NormalizedField normInput,
+            final NormalizedField normOutput,
+            final BasicNetwork neuralNetwork
     ) {
         activationFunctionForEncog = encogActivationFunctions;
         activationFunction = new ArrayList<>(encogActivationFunctions.length);
@@ -174,21 +175,21 @@ class EncogInterface
      */
     public
     BasicNetwork initializeEncogPerceptron( final boolean randomized ) {
-        if ( ( getNeuronQuantityInLayer() == null ) || ( getNeuronQuantityInLayer().length < 2 ) ) {
+        if ( ( neuronQuantityInLayer == null ) || ( neuronQuantityInLayer.length < 2 ) ) {
             throw new IllegalArgumentException("la cantidad de capas es de mínimo 2 para un perceptrón (incluyendo entrada y salida)");
         }
         final BasicNetwork perceptron = new BasicNetwork();
-        perceptron.addLayer(new BasicLayer(null, containBias(), getNeuronQuantityInLayer()[0]));
-        final int          getNeuronQuantityInLayerLength = getNeuronQuantityInLayer().length - 1;
+        perceptron.addLayer(new BasicLayer(null, containBias(), neuronQuantityInLayer[0]));
+        final int          getNeuronQuantityInLayerLength = neuronQuantityInLayer.length - 1;
         ActivationFunction function;
         for ( int i = 1; i < getNeuronQuantityInLayerLength; i++ ) {
             function = activationFunctionForEncog[i - 1].clone();
-            perceptron.addLayer(new BasicLayer(function, containBias(), getNeuronQuantityInLayer()[i]));
+            perceptron.addLayer(new BasicLayer(function, containBias(), neuronQuantityInLayer[i]));
         }
         //perceptronConfiguration.getNeuronQuantityInLayer().length - 2 porque el for finaliza en perceptronConfiguration.getNeuronQuantityInLayer
         // ().length - 1
-        function = activationFunctionForEncog[getNeuronQuantityInLayer().length - 2].clone();
-        perceptron.addLayer(new BasicLayer(function, false, getNeuronQuantityInLayer()[getNeuronQuantityInLayer().length - 1]));
+        function = activationFunctionForEncog[neuronQuantityInLayer.length - 2].clone();
+        perceptron.addLayer(new BasicLayer(function, false, neuronQuantityInLayer[neuronQuantityInLayer.length - 1]));
         perceptron.getStructure().finalizeStructure();
         if ( randomized ) {
             perceptron.reset();
@@ -202,8 +203,6 @@ class EncogInterface
      * @param perceptronFile       archivo con la red neuronal.
      * @param randomizedIfNotExist true si debe inicializar al azar los pesos y bias al crear una nueva red neuronal.
      * @param createFile           true si debe crear una nueva red neuronal.
-     *
-     * @throws Exception al intentar guardar la red neuronal
      */
     public
     void loadOrCreatePerceptron(
@@ -211,7 +210,7 @@ class EncogInterface
             final boolean randomizedIfNotExist,
             final boolean createFile
     )
-            throws Exception {
+            throws IOException, ClassNotFoundException {
         if ( createFile ) {
             if ( perceptronFile.exists() ) {
                 //si el archivo existe, lo cargamos como perceptron entrenado al juego
@@ -230,12 +229,10 @@ class EncogInterface
      * Guarda la red neuronal en un archivo
      *
      * @param neuralNetworkFile red neuronal a salvar en archivo.
-     *
-     * @throws Exception al intentar guardar la red neuronal
      */
     public
     void saveNeuralNetwork( final File neuralNetworkFile )
-            throws Exception {
+            throws IOException {
         SerializeObject.save(neuralNetworkFile, neuralNetwork);
     }
 
