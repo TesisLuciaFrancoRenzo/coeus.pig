@@ -45,5 +45,11 @@ enum RollDicesAction
     int getNumVal() {
         return numVal;
     }
+
+    @Override
+    public
+    String toString() {
+        return "RollDicesAction{" + "numVal=" + numVal + '}';
+    }
 }
 

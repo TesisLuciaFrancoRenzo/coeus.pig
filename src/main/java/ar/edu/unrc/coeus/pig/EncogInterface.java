@@ -14,12 +14,14 @@ import org.encog.util.obj.SerializeObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
 public
 class EncogInterface
         implements INeuralNetworkInterface {
+    private final boolean concurrentInput;
     private List< Function< Double, Double > > activationFunction         = null;
     private ActivationFunction[]               activationFunctionForEncog = null;
     private double                             activationFunctionMax      = 0.0;
@@ -38,6 +40,7 @@ class EncogInterface
             final double activationFunctionMin,
             final boolean hasBias,
             final int[] neuronQuantityInLayer,
+            final boolean concurrentInput,
             final NormalizedField normInput,
             final NormalizedField normOutput,
             final BasicNetwork neuralNetwork
@@ -49,6 +52,7 @@ class EncogInterface
         this.activationFunctionMin = activationFunctionMin;
         this.hasBias = hasBias;
         this.neuronQuantityInLayer = neuronQuantityInLayer;
+        this.concurrentInput = concurrentInput;
         this.normInput = normInput;
         this.normOutput = normOutput;
         this.neuralNetwork = neuralNetwork;
@@ -71,6 +75,11 @@ class EncogInterface
     public
     boolean containBias() {
         return hasBias;
+    }
+
+    public
+    double deNormalizeOutput( final double value ) {
+        return normOutput.deNormalize(value);
     }
 
     public
@@ -186,8 +195,6 @@ class EncogInterface
             function = activationFunctionForEncog[i - 1].clone();
             perceptron.addLayer(new BasicLayer(function, containBias(), neuronQuantityInLayer[i]));
         }
-        //perceptronConfiguration.getNeuronQuantityInLayer().length - 2 porque el for finaliza en perceptronConfiguration.getNeuronQuantityInLayer
-        // ().length - 1
         function = activationFunctionForEncog[neuronQuantityInLayer.length - 2].clone();
         perceptron.addLayer(new BasicLayer(function, false, neuronQuantityInLayer[neuronQuantityInLayer.length - 1]));
         perceptron.getStructure().finalizeStructure();
@@ -195,6 +202,11 @@ class EncogInterface
             perceptron.reset();
         }
         return perceptron;
+    }
+
+    public
+    boolean isConcurrentInputEnabled() {
+        return concurrentInput;
     }
 
     /**
@@ -223,6 +235,11 @@ class EncogInterface
         } else {
             neuralNetwork = initializeEncogPerceptron(randomizedIfNotExist);
         }
+    }
+
+    public
+    double normalizeOutput( final Double value ) {
+        return normOutput.normalize(value);
     }
 
     /**
@@ -260,5 +277,15 @@ class EncogInterface
             final double correctedWeight
     ) {
         neuralNetwork.setWeight(layerIndex - 1, neuronIndexPreviousLayer, neuronIndex, correctedWeight);
+    }
+
+    @Override
+    public
+    String toString() {
+        return "EncogInterface{" + "concurrentInput=" + concurrentInput + ", activationFunction=" + activationFunction +
+               ", activationFunctionForEncog=" + Arrays.toString(activationFunctionForEncog) + ", activationFunctionMax=" + activationFunctionMax +
+               ", activationFunctionMin=" + activationFunctionMin + ", derivedActivationFunction=" + derivedActivationFunction + ", hasBias=" +
+               hasBias + ", neuralNetwork=" + neuralNetwork + ", neuronQuantityInLayer=" + Arrays.toString(neuronQuantityInLayer) + ", normInput=" +
+               normInput + ", normOutput=" + normOutput + '}';
     }
 }

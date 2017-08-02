@@ -22,7 +22,10 @@ package ar.edu.unrc.coeus.pig;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IAction;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IProblemToTrain;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
+import ar.edu.unrc.coeus.tdlearning.interfaces.IStatePerceptron;
 import ar.edu.unrc.coeus.tdlearning.learning.TDLambdaLearning;
+import org.encog.ml.data.MLData;
+import org.encog.ml.data.basic.BasicMLData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 
 /**
@@ -49,6 +53,8 @@ class Game
             RollDicesAction.ROLL8DICES,
             RollDicesAction.ROLL9DICES,
             RollDicesAction.ROLL10DICES);
+    private static final double          MAX_REWARD                   = 1000;
+    private final EncogInterface                 encogInterface;
     private final Function< GameState, Integer > player1Brain;
     private final Function< GameState, Integer > player2Brain;
     private final Random                         random;
@@ -57,9 +63,11 @@ class Game
     public
     Game(
             final PlayerType player1Type,
-            final PlayerType player2Type
+            final PlayerType player2Type,
+            final EncogInterface encogInterface
     ) {
         random = new Random();
+        this.encogInterface = encogInterface;
         currentGameState = new GameState();
         player1Brain = setPlayerType(player1Type);
         player2Brain = setPlayerType(player2Type);
@@ -68,26 +76,26 @@ class Game
     public static
     void main( final String[] args ) {
         if ( args[0].contains("Humans") ) {
-            final Game pig = new Game(PlayerType.HUMAN, PlayerType.HUMAN);
+            final Game pig = new Game(PlayerType.HUMAN, PlayerType.HUMAN, null);
             pig.play(true);
         } else if ( args[0].contains("HumanVsRandom") ) {
             final int  humanPlayer = Integer.parseInt(args[1]);
             final Game pig;
             switch ( humanPlayer ) {
                 case 1:
-                    pig = new Game(PlayerType.HUMAN, PlayerType.RANDOM);
+                    pig = new Game(PlayerType.HUMAN, PlayerType.RANDOM, null);
                     break;
                 case 2:
-                    pig = new Game(PlayerType.RANDOM, PlayerType.HUMAN);
+                    pig = new Game(PlayerType.RANDOM, PlayerType.HUMAN, null);
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown human player position. Usage: ./pig HumanVsRandom (1|2)");
             }
             pig.play(true);
         } else if ( args[0].contains("TrainRandom") ) {
-            final Game pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM);
+            final Game pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM, null);
             pig1.train();
-            final Game pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON);
+            final Game pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON, null);
             pig2.train();
             //TODO continuar!
         }
@@ -138,8 +146,8 @@ class Game
     @SuppressWarnings( "IOResourceOpenedButNotSafelyClosed" )
     private static
     int userInput() {
-        int            value = 0;
-        BufferedReader br    = new BufferedReader(new InputStreamReader(System.in));
+        int                  value = 0;
+        final BufferedReader br    = new BufferedReader(new InputStreamReader(System.in));
         while ( ( value < 1 ) || ( value > 10 ) ) {
             try {
                 final String s = br.readLine();
@@ -208,19 +216,33 @@ class Game
     Double computeNumericRepresentationFor(
             final Object[] output
     ) {
-        return null;
+        return (Double) output[0];
     }
 
     @Override
     public
     double deNormalizeValueFromPerceptronOutput( final Object value ) {
-        return 0;
+        return encogInterface.deNormalizeOutput((double) value);
     }
 
     @Override
     public
     Object[] evaluateStateWithPerceptron( final IState state ) {
-        return new Object[0];
+        //creamos las entradas de la red neuronal
+        final double[] inputs     = new double[encogInterface.getNeuronQuantityInLayer()[0]];
+        IntStream      inputLayer = IntStream.range(0, encogInterface.getNeuronQuantityInLayer()[0]);
+        inputLayer = encogInterface.isConcurrentInputEnabled() ? inputLayer.parallel() : inputLayer.sequential();
+        inputLayer.forEach(index -> inputs[index] = ( (IStatePerceptron) state ).translateToPerceptronInput(index));
+
+        //cargamos la entrada a la red
+        final MLData   inputData  = new BasicMLData(inputs);
+        final MLData   output     = encogInterface.getNeuralNetwork().compute(inputData);
+        final Double[] out        = new Double[output.getData().length];
+        final int      outputSize = output.size();
+        for ( int i = 0; i < outputSize; i++ ) {
+            out[i] = output.getData()[i];
+        }
+        return out;
     }
 
     @Override
@@ -239,7 +261,10 @@ class Game
     @Override
     public
     double normalizeValueToPerceptronOutput( final Object value ) {
-        return 0;
+        if ( (Double) value > MAX_REWARD ) {
+            throw new IllegalArgumentException("value no puede ser mayor a MAX_REWARD=" + MAX_REWARD);
+        }
+        return encogInterface.normalizeOutput((Double) value);
     }
 
     private
@@ -323,5 +348,12 @@ class Game
         RANDOM,
         GREEDY,
         PERCEPTRON
+    }
+
+    @Override
+    public
+    String toString() {
+        return "Game{" + "encogInterface=" + encogInterface + ", player1Brain=" + player1Brain + ", player2Brain=" + player2Brain +
+               ", currentGameState=" + currentGameState + '}';
     }
 }
