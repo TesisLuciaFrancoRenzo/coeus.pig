@@ -25,6 +25,7 @@ import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
 import ar.edu.unrc.coeus.tdlearning.learning.TDLambdaLearning;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
@@ -49,27 +50,34 @@ class Pig
             Action.ROLL9DICES,
             Action.ROLL10DICES);
     private State               currentState;
-    private Supplier< Integer > opponentResultFunction;
+    private Supplier< Integer > player1Brain;
+    private Supplier< Integer > player2Brain;
     private Random              random;
 
     public
-    Pig( OpponentType opponentType ) {
+    Pig(
+            PlayerType player1Type,
+            PlayerType player2Type
+    ) {
         random = new Random();
         currentState = new State();
-        switch ( opponentType ) {
-            case RANDOM:
-                opponentResultFunction = () -> rollDices(TDLambdaLearning.randomBetween(1, 10, random), random, false);
-                break;
-            default:
-                opponentResultFunction = null;
-        }
+        player1Brain = setBrainToPlayer(player1Type);
+        player2Brain = setBrainToPlayer(player2Type);
     }
 
     public static
     void main( final String[] args ) {
-        if ( args[0].contains("humans") ) {
-            final Pig pig = new Pig(OpponentType.HUMAN);
-            pig.playHumanVsHuman();
+        if ( args[0].contains("Humans") ) {
+            final Pig pig = new Pig(PlayerType.HUMAN, PlayerType.HUMAN);
+            pig.playHuman();
+        } else if ( args[0].contains("HumanVsRandom") ) {
+            final Pig pig = new Pig(PlayerType.HUMAN, PlayerType.RANDOM);
+            pig.playHuman();
+        } else if ( args[0].contains("TrainRandom") ) {
+            final Pig pig1 = new Pig(PlayerType.PERCEPTRON, PlayerType.RANDOM);
+            pig1.train();
+            final Pig pig2 = new Pig(PlayerType.RANDOM, PlayerType.PERCEPTRON);
+            pig2.train();
         }
     }
 
@@ -117,16 +125,23 @@ class Pig
      */
     private static
     int userInput() {
-        while ( true ) {
-            try ( BufferedReader br = new BufferedReader(new InputStreamReader(System.in)) ) {
-                final String s     = br.readLine();
-                final int    value = Integer.parseInt(s);
-                if ( ( value < 1 ) || ( value > 10 ) ) {throw new Exception("Incorrect input value");}
-                return value;
-            } catch ( Exception e ) {
-                System.out.println("Error: Debe introducir un numero del 1 al 10");
+        int value = 0;
+        while ( ( value < 1 ) || ( value > 10 ) ) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                String s = br.readLine();
+                value = Integer.parseInt(s);
+            } catch ( NumberFormatException e ) {
+                value = 0;
+            } catch ( IOException e ) {
+                e.printStackTrace();
+                value = 0;
+            }
+            if ( ( value < 1 ) || ( value > 10 ) ) {
+                System.out.println("Error: Debe introducir un numero del 1 al 10: ");
             }
         }
+        return value;
     }
 
     @Override
@@ -158,14 +173,14 @@ class Pig
             finalState.addPlayer1Score(rollDices(finalState.getDicesToRoll(), random, false));
             if ( !finalState.isTerminalState() ) {
                 //acciones del jugador 2, consideradas como acciones estocásticas del jugador 1
-                finalState.addPlayer2Score(rollDices(opponentResultFunction.get(), random, false));
+                finalState.addPlayer2Score(rollDices(player1Brain.get(), random, false));
             }
         } else {
             //acciones estocásticas del jugador 2
             finalState.addPlayer2Score(rollDices(finalState.getDicesToRoll(), random, false));
             if ( !finalState.isTerminalState() ) {
                 //acciones del jugador 1, consideradas como acciones estocásticas del jugador 2
-                finalState.addPlayer1Score(rollDices(opponentResultFunction.get(), random, false));
+                finalState.addPlayer1Score(rollDices(player1Brain.get(), random, false));
             }
         }
         return finalState;
@@ -222,8 +237,8 @@ class Pig
     }
 
     private
-    void playHumanVsHuman() {
-        System.out.println("Hola Jugamos al Pig!!! Humano vs Humano");
+    void playHuman() {
+        System.out.println("Hola Jugamos al Pig!!!");
         final Random random = new Random();
         random.setSeed(System.currentTimeMillis());
         while ( !currentState.isTerminalState() ) {
@@ -232,13 +247,18 @@ class Pig
             } else {
                 System.out.println("======== Turno del jugador 2 ========");
             }
-            System.out.println("¿Cuántos dados desea tirar (1 a 10)?");
-            // entrada del jugador
-            currentState.setDicesToRoll(userInput());
+            System.out.println("¿Cuántos dados desea tirar (1 a 10)?: ");
+
             if ( currentState.isPlayer1() ) {
+                // entrada del jugador 1
+                currentState.setDicesToRoll(player1Brain.get());
+                // tiramos dados y calculamos puntaje
                 currentState.addPlayer1Score(rollDices(currentState.getDicesToRoll(), random, true));
                 System.out.println("* Puntaje Total = " + currentState.getPlayer1Score() + " *");
             } else {
+                // entrada del jugador 2
+                currentState.setDicesToRoll(player2Brain.get());
+                // tiramos dados y calculamos puntaje
                 currentState.addPlayer2Score(rollDices(currentState.getDicesToRoll(), random, true));
                 System.out.println("* Puntaje Total = " + currentState.getPlayer2Score() + " *");
             }
@@ -256,8 +276,25 @@ class Pig
         }
     }
 
+    private
+    Supplier< Integer > setBrainToPlayer( PlayerType player1Type ) {
+        switch ( player1Type ) {
+            case RANDOM:
+                return () -> TDLambdaLearning.randomBetween(1, 10, random);
+            case HUMAN:
+                return () -> userInput();
+            default:
+                return null;
+        }
+    }
+
+    private
+    void train() {
+
+    }
+
     public
-    enum OpponentType {
+    enum PlayerType {
         HUMAN,
         RANDOM,
         GREEDY,
