@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
@@ -102,8 +103,7 @@ class Game
         final int  humanPlayer;
         final PerceptronConfiguration config = new PerceptronConfiguration("PerceptronVsRandom",
                 new File("../PigPerceptrons/"),
-                new ActivationFunction[] { new ActivationTANH() },
-                1, -1, 100, -100,
+                new ActivationFunction[] { new ActivationTANH() }, 1, -1, 100, -100,
                 true,
                 new int[] { 332, 1 },
                 false,
@@ -111,8 +111,7 @@ class Game
                 new double[] { 0.0025, 0.0025 },
                 0.3,
                 false,
-                1.0,
-                new boolean[] { false, false }, false,
+                1.0, new boolean[] { false, false }, false,
                 false);
         switch ( args[0] ) {
             case HUMANS:
@@ -278,11 +277,11 @@ class Game
             }
             if ( ( i % 100 ) == 0 ) {
                 final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
-                System.out.println(percent + "%");
+                System.out.println(new Date() + " - " + percent + " %");
             }
         }
         double winRate = ( wins * 100d ) / ( gamesToPlay * 2d );
-        System.out.println("** WinRate = " + winRate + " (" + wins + "/" + gamesToPlay + ")");
+        System.out.println(new Date() + " == WinRate = " + winRate + " (" + wins + "/" + gamesToPlay + ")");
     }
 
     private static
@@ -311,10 +310,11 @@ class Game
             learningAlgorithm.solveAndTrainOnce(pig2, i);
             if ( ( i % 100 ) == 0 ) {
                 final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
-                System.out.println(percent + "%");
+                System.out.println(new Date() + " - " + percent + " %");
             }
         }
         perceptronConfiguration.saveTrainedNeuralNetwork();
+        System.out.println(new Date() + " == Training Finished.");
     }
 
     /**
