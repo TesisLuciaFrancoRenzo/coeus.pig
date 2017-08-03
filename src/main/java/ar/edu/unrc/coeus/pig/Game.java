@@ -102,16 +102,14 @@ class Game
         final int  gamesToPlay;
         final int  humanPlayer;
         final PerceptronConfiguration config = new PerceptronConfiguration("PerceptronVsRandom",
-                new File("../PigPerceptrons/"),
-                new ActivationFunction[] { new ActivationTANH() }, 1, -1, 100, -100,
+                new File("../PigPerceptrons/"), new ActivationFunction[] { new ActivationTANH() }, 1, -1, 100, -100,
                 true,
                 new int[] { 332, 1 },
                 false,
                 ELearningStyle.AFTER_STATE,
                 new double[] { 0.0025, 0.0025 },
                 0.3,
-                false,
-                1.0, new boolean[] { false, false }, false,
+                false, 1.0, new boolean[] { false, false }, false,
                 false);
         switch ( args[0] ) {
             case HUMANS:
@@ -257,6 +255,11 @@ class Game
         return total;
     }
 
+    /**
+     * @param pig1
+     * @param pig2
+     * @param gamesToPlay cantidad de veces que se juega como cada jugador (gamesToPlay = veces jugada como jugador 1 + veces jugadas como jugador 2)
+     */
     private static
     void simulate(
             final Game pig1,
@@ -284,6 +287,15 @@ class Game
         System.out.println(new Date() + " == WinRate = " + winRate + " (" + wins + "/" + gamesToPlay + ")");
     }
 
+    /**
+     * @param perceptronConfiguration
+     * @param pig1
+     * @param pig2
+     * @param gamesToPlay             cantidad de veces que se juega como cada jugador (gamesToPlay = veces jugada como jugador 1 + veces jugadas como
+     *                                jugador 2)
+     *
+     * @throws IOException
+     */
     private static
     void train(
             final PerceptronConfiguration perceptronConfiguration,
