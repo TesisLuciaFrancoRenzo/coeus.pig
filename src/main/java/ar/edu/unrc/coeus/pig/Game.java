@@ -49,19 +49,19 @@ import java.util.stream.IntStream;
 public
 class Game
         implements IProblemToTrain {
-    public static final String HUMANS                     = "Humans";
-    public static final String HUMAN_VS_RANDOM            = "HumanVsRandom";
-    public static final String HUMAN_VS_TRAINED           = "HumanVsTrained";
-    public static final String SIMULATE_GREEDY            = "SimulateGreedy";
-    public static final String SIMULATE_INITIAL_VS_GREEDY = "SimulateInitialVsGreedy";
-    public static final String SIMULATE_INITIAL_VS_RANDOM = "SimulateInitialVsRandom";
-    public static final String SIMULATE_LAZY              = "SimulateLazy";
-    public static final String SIMULATE_RANDOM            = "SimulateRandom";
-    public static final String SIMULATE_TRAINED_VS_GREEDY = "SimulateTrainedVsGreedy";
-    public static final String SIMULATE_TRAINED_VS_ITSELF = "SimulateTrainedVsItself";
-    public static final String SIMULATE_TRAINED_VS_RANDOM = "SimulateTrainedVsRandom";
-    public static final String TRAIN_VS_GREEDY            = "TrainVsGreedy";
-    public static final String TRAIN_VS_ITSELF            = "TrainVsItself";
+    public static final  String          HUMANS                       = "Humans";
+    public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
+    public static final  String          HUMAN_VS_TRAINED             = "HumanVsTrained";
+    public static final  String          SIMULATE_GREEDY              = "SimulateGreedy";
+    public static final  String          SIMULATE_INITIAL_VS_GREEDY   = "SimulateInitialVsGreedy";
+    public static final  String          SIMULATE_INITIAL_VS_RANDOM   = "SimulateInitialVsRandom";
+    public static final  String          SIMULATE_LAZY                = "SimulateLazy";
+    public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
+    public static final  String          SIMULATE_TRAINED_VS_GREEDY   = "SimulateTrainedVsGreedy";
+    public static final  String          SIMULATE_TRAINED_VS_ITSELF   = "SimulateTrainedVsItself";
+    public static final  String          SIMULATE_TRAINED_VS_RANDOM   = "SimulateTrainedVsRandom";
+    public static final  String          TRAIN_VS_GREEDY              = "TrainVsGreedy";
+    public static final  String          TRAIN_VS_ITSELF              = "TrainVsItself";
     public static final  String          TRAIN_VS_RANDOM              = "TrainVsRandom";
     public static final  String          USAGE                        = "Usage: ./pig [(Humans)|(TrainRandom)|(HumanVsRandom (1|2))]";
     private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS = Arrays.asList(RollDicesAction.ROLL1DICE,
@@ -118,8 +118,7 @@ class Game
                         -250,
                         true,
                         new int[] { 322, 1 },
-                        false,
-                        ELearningStyle.AFTER_STATE, new double[] { 0.005, 0.005 }, 0.5,
+                        false, ELearningStyle.AFTER_STATE, new double[] { 0.005, 0.005 }, 0.5,
                         false,
                         1.0,
                         new boolean[] { false, false },
@@ -371,7 +370,7 @@ class Game
             if ( pig2.currentGameState.getPlayer2TotalReward() > maxFinalReward ) {
                 maxFinalReward = pig2.currentGameState.getPlayer2TotalReward();
             }
-            if ( ( i % 100 ) == 0 ) {
+            if ( ( i % ( gamesToPlay / 100 ) ) == 0 ) {
                 final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
                 System.out.println(new Date() + " - " + percent + " %");
             }
@@ -414,7 +413,7 @@ class Game
             learningAlgorithm.solveAndTrainOnce(pig1, i);
             pig2.reset();
             learningAlgorithm.solveAndTrainOnce(pig2, i);
-            if ( ( i % 100 ) == 0 ) {
+            if ( ( i % ( gamesToPlay / 100 ) ) == 0 ) {
                 final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
                 System.out.println(new Date() + " - " + percent + " %");
             }
