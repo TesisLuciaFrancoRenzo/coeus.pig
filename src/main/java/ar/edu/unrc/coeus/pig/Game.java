@@ -19,10 +19,7 @@
 
 package ar.edu.unrc.coeus.pig;
 
-import ar.edu.unrc.coeus.tdlearning.interfaces.IAction;
-import ar.edu.unrc.coeus.tdlearning.interfaces.IProblemToTrain;
-import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
-import ar.edu.unrc.coeus.tdlearning.interfaces.IStatePerceptron;
+import ar.edu.unrc.coeus.tdlearning.interfaces.*;
 import ar.edu.unrc.coeus.tdlearning.learning.ELearningStyle;
 import ar.edu.unrc.coeus.tdlearning.learning.TDLambdaLearning;
 import org.encog.engine.network.activation.ActivationFunction;
@@ -93,8 +90,8 @@ class Game
         this.perceptronConfiguration = perceptronConfiguration;
         encogInterface = perceptronConfiguration != null ? perceptronConfiguration.getEncogInterface() : null;
         currentGameState = new GameState(isAIPlayer1);
-        player1Brain = setPlayerType(player1Type);
-        player2Brain = setPlayerType(player2Type);
+        player1Brain = setPlayerType(player1Type, this);
+        player2Brain = setPlayerType(player2Type, this);
     }
 
     public static
@@ -114,11 +111,7 @@ class Game
                         //FIXME esta bien?
                         1,
                         -1,
-                        250,
-                        -250,
-                        true,
-                        new int[] { 322, 1 },
-                        false, ELearningStyle.AFTER_STATE, new double[] { 0.005, 0.005 }, 0.5,
+                        250, -250, false, new int[] { 322, 1 }, false, ELearningStyle.AFTER_STATE, new double[] { 0.0025, 0.0025 }, 0,
                         false,
                         1.0,
                         new boolean[] { false, false },
@@ -377,7 +370,7 @@ class Game
         }
         double winRate = ( wins * 100d ) / ( gamesToPlay * 2d );
         System.out.println(
-                new Date() + " == WinRate = " + winRate + " (" + wins + "/" + ( gamesToPlay * 2 ) + ") - maxFinalReward=" + maxFinalReward);
+                new Date() + " => WinRate = " + winRate + " (" + wins + "/" + ( gamesToPlay * 2 ) + ") - maxFinalReward=" + maxFinalReward);
     }
 
     /**
@@ -419,7 +412,7 @@ class Game
             }
         }
         perceptronConfiguration.saveTrainedNeuralNetwork();
-        System.out.println(new Date() + " == Training Finished.");
+        System.out.println(new Date() + " => Training Finished.");
     }
 
     /**
@@ -610,7 +603,10 @@ class Game
     }
 
     private
-    Function< GameState, Integer > setPlayerType( final PlayerType playerType ) {
+    Function< GameState, Integer > setPlayerType(
+            final PlayerType playerType,
+            final IProblemRunner problemRunner
+    ) {
         switch ( playerType ) {
             case RANDOM:
                 return ( gameState ) -> TDLambdaLearning.randomBetween(1, 10, random);
@@ -624,7 +620,7 @@ class Game
                 return ( gameState ) -> {
                     // evaluamos cada acción aplicada al estado inicial y elegimos la mejor
                     // acción basada en las predicciones del problema
-                    return ( (RollDicesAction) TDLambdaLearning.computeBestPossibleAction(this,
+                    return ( (RollDicesAction) TDLambdaLearning.computeBestPossibleAction(problemRunner,
                             perceptronConfiguration.getLearningStyle(),
                             gameState,
                             LIST_OF_ALL_POSSIBLE_ACTIONS,
