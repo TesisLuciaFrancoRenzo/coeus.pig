@@ -95,16 +95,16 @@ class EncogInterface
 
     /**
      * @param perceptronFile       archivo con la red neuronal.
-     * @param randomizedIfNotExist true si debe inicializar al azar los pesos y bias al crear una nueva red neuronal.
+     * @param randomized true si debe inicializar al azar los pesos y bias al crear una nueva red neuronal.
      */
     public
     void createPerceptron(
             final File perceptronFile,
-            final boolean randomizedIfNotExist
+            final boolean randomized
     )
             throws IOException, ClassNotFoundException {
         //Si el archivo no existe, creamos un perceptron nuevo inicializado al azar
-        neuralNetwork = initializeEncogPerceptron(randomizedIfNotExist);
+        neuralNetwork = initializeEncogPerceptron(randomized);
         SerializeObject.save(perceptronFile, neuralNetwork);
     }
 

@@ -49,17 +49,19 @@ import java.util.stream.IntStream;
 public
 class Game
         implements IProblemToTrain {
-    public static final  String          HUMANS                       = "Humans";
-    public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
-    public static final  String          HUMAN_VS_TRAINED             = "HumanVsTrained";
-    public static final  String          SIMULATE_GREEDY              = "SimulateGreedy";
-    public static final  String          SIMULATE_INITIAL             = "SimulateInitial";
-    public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
-    public static final  String          SIMULATE_TRAINED_VS_GREEDY   = "SimulateTrainedVsGreedy";
-    public static final  String          SIMULATE_TRAINED_VS_ITSELF   = "SimulateTrainedVsItself";
-    public static final  String          SIMULATE_TRAINED_VS_RANDOM   = "SimulateTrainedVsRandom";
-    public static final  String          TRAIN_VS_GREEDY              = "TrainVsGreedy";
-    public static final  String          TRAIN_VS_ITSELF              = "TrainVsItself";
+    public static final String HUMANS                     = "Humans";
+    public static final String HUMAN_VS_RANDOM            = "HumanVsRandom";
+    public static final String HUMAN_VS_TRAINED           = "HumanVsTrained";
+    public static final String SIMULATE_GREEDY            = "SimulateGreedy";
+    public static final String SIMULATE_INITIAL_VS_GREEDY = "SimulateInitialVsGreedy";
+    public static final String SIMULATE_INITIAL_VS_RANDOM = "SimulateInitialVsRandom";
+    public static final String SIMULATE_LAZY              = "SimulateLazy";
+    public static final String SIMULATE_RANDOM            = "SimulateRandom";
+    public static final String SIMULATE_TRAINED_VS_GREEDY = "SimulateTrainedVsGreedy";
+    public static final String SIMULATE_TRAINED_VS_ITSELF = "SimulateTrainedVsItself";
+    public static final String SIMULATE_TRAINED_VS_RANDOM = "SimulateTrainedVsRandom";
+    public static final String TRAIN_VS_GREEDY            = "TrainVsGreedy";
+    public static final String TRAIN_VS_ITSELF            = "TrainVsItself";
     public static final  String          TRAIN_VS_RANDOM              = "TrainVsRandom";
     public static final  String          USAGE                        = "Usage: ./pig [(Humans)|(TrainRandom)|(HumanVsRandom (1|2))]";
     private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS = Arrays.asList(RollDicesAction.ROLL1DICE,
@@ -105,24 +107,26 @@ class Game
         final Game pig2;
         final int  gamesToPlay;
         final int  humanPlayer;
-        final PerceptronConfiguration config = new PerceptronConfiguration("PigPerceptron",
-                new File("../PigPerceptrons/"),
-                new ActivationFunction[] { new ActivationTANH() },
-                1,
-                -1,
-                100,
-                -100,
-                true,
-                new int[] { 332, 1 },
-                false,
-                ELearningStyle.AFTER_STATE,
-                new double[] { 0.0025, 0.0025 },
-                0.3,
-                true,
-                1.0,
-                new boolean[] { false, false },
-                false,
-                false);
+        final PerceptronConfiguration config =
+                new PerceptronConfiguration("PigPerceptron",
+                        new File("../PigPerceptrons/"),
+                        new ActivationFunction[] { new ActivationTANH() },
+                        //FIXME esta bien?
+                        1,
+                        -1,
+                        250,
+                        -250,
+                        true,
+                        new int[] { 322, 1 },
+                        false,
+                        ELearningStyle.AFTER_STATE,
+                        new double[] { 0.0025, 0.0025 },
+                        0.3,
+                        false,
+                        1.0,
+                        new boolean[] { false, false },
+                        false,
+                        false);
         switch ( args[0] ) {
             case HUMANS:
                 pig1 = new Game(PlayerType.HUMAN, PlayerType.HUMAN, null, true);
@@ -247,7 +251,17 @@ class Game
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_RANDOM + " \"number\"");
                 }
                 break;
-            case SIMULATE_INITIAL:
+            case SIMULATE_LAZY:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.LAZY, PlayerType.LAZY, null, true);
+                    pig2 = new Game(PlayerType.LAZY, PlayerType.LAZY, null, false);
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_LAZY + " \"number\"");
+                }
+                break;
+            case SIMULATE_INITIAL_VS_RANDOM:
                 try {
                     gamesToPlay = Integer.parseInt(args[1]);
                     pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM, config, true);
@@ -255,7 +269,18 @@ class Game
                     config.loadInitialPerceptron();
                     simulate(pig1, pig2, gamesToPlay);
                 } catch ( final NumberFormatException ignored ) {
-                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_INITIAL + " \"number\"");
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_INITIAL_VS_RANDOM + " \"number\"");
+                }
+                break;
+            case SIMULATE_INITIAL_VS_GREEDY:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.GREEDY, config, true);
+                    pig2 = new Game(PlayerType.GREEDY, PlayerType.PERCEPTRON, config, false);
+                    config.loadInitialPerceptron();
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_INITIAL_VS_GREEDY + " \"number\"");
                 }
                 break;
             case SIMULATE_GREEDY:
@@ -323,17 +348,30 @@ class Game
             final Game pig2,
             final int gamesToPlay
     ) {
-        int wins = 0;
+        int wins           = 0;
+        int maxFinalReward = 0;
         for ( int i = 1; i <= gamesToPlay; i++ ) {
             pig1.reset();
             pig1.play(false);
             if ( pig1.currentGameState.getWinner() == 1 ) {
                 wins++;
             }
+            if ( pig1.currentGameState.getPlayer1TotalReward() > maxFinalReward ) {
+                maxFinalReward = pig1.currentGameState.getPlayer1TotalReward();
+            }
+            if ( pig1.currentGameState.getPlayer2TotalReward() > maxFinalReward ) {
+                maxFinalReward = pig1.currentGameState.getPlayer2TotalReward();
+            }
             pig2.reset();
             pig2.play(false);
             if ( pig2.currentGameState.getWinner() == 2 ) {
                 wins++;
+            }
+            if ( pig2.currentGameState.getPlayer1TotalReward() > maxFinalReward ) {
+                maxFinalReward = pig2.currentGameState.getPlayer1TotalReward();
+            }
+            if ( pig2.currentGameState.getPlayer2TotalReward() > maxFinalReward ) {
+                maxFinalReward = pig2.currentGameState.getPlayer2TotalReward();
             }
             if ( ( i % 100 ) == 0 ) {
                 final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
@@ -341,7 +379,8 @@ class Game
             }
         }
         double winRate = ( wins * 100d ) / ( gamesToPlay * 2d );
-        System.out.println(new Date() + " == WinRate = " + winRate + " (" + wins + "/" + ( gamesToPlay * 2 ) + ")");
+        System.out.println(
+                new Date() + " == WinRate = " + winRate + " (" + wins + "/" + ( gamesToPlay * 2 ) + ") - maxFinalReward=" + maxFinalReward);
     }
 
     /**
@@ -582,6 +621,8 @@ class Game
                 return ( gameState ) -> userInput();
             case GREEDY:
                 return ( gameState ) -> 10;
+            case LAZY:
+                return ( gameState ) -> 1;
             case PERCEPTRON:
                 return ( gameState ) -> {
                     // evaluamos cada acción aplicada al estado inicial y elegimos la mejor
@@ -611,6 +652,7 @@ class Game
         HUMAN,
         RANDOM,
         GREEDY,
+        LAZY,
         PERCEPTRON
     }
 }
