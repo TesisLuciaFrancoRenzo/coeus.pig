@@ -112,8 +112,7 @@ class Game
                 0.3,
                 false,
                 1.0,
-                new boolean[] { false, false },
-                true,
+                new boolean[] { false, false }, false,
                 false);
         switch ( args[0] ) {
             case HUMANS:
@@ -265,26 +264,25 @@ class Game
             final Game pig2,
             final int gamesToPlay
     ) {
-        double winRate = 0;
-
+        int wins = 0;
         for ( int i = 1; i <= gamesToPlay; i++ ) {
             pig1.reset();
             pig1.play(false);
             if ( pig1.currentGameState.getWinner() == 1 ) {
-                winRate += 1.0d;
+                wins++;
             }
             pig2.reset();
             pig2.play(false);
-            if ( pig1.currentGameState.getWinner() == 2 ) {
-                winRate += 1.0d;
+            if ( pig2.currentGameState.getWinner() == 2 ) {
+                wins++;
             }
             if ( ( i % 100 ) == 0 ) {
                 final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
                 System.out.println(percent + "%");
             }
         }
-        winRate = ( winRate * 100d ) / ( gamesToPlay * 2d );
-        System.out.println("** WinRate = " + winRate);
+        double winRate = ( wins * 100d ) / ( gamesToPlay * 2d );
+        System.out.println("** WinRate = " + winRate + " (" + wins + "/" + gamesToPlay + ")");
     }
 
     private static
