@@ -23,11 +23,16 @@ import ar.edu.unrc.coeus.tdlearning.interfaces.IAction;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IProblemToTrain;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IStatePerceptron;
+import ar.edu.unrc.coeus.tdlearning.learning.ELearningStyle;
 import ar.edu.unrc.coeus.tdlearning.learning.TDLambdaLearning;
+import org.encog.engine.network.activation.ActivationFunction;
+import org.encog.engine.network.activation.ActivationTANH;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -43,6 +48,13 @@ import java.util.stream.IntStream;
 public
 class Game
         implements IProblemToTrain {
+    public static final  String          HUMANS                       = "Humans";
+    public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
+    public static final  String          HUMAN_VS_TRAINED             = "HumanVsTrained";
+    public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
+    public static final  String          SIMULATE_TRAIN_VS_RANDOM     = "SimulateTrainVsRandom";
+    public static final  String          TRAIN_VS_RANDOM              = "TrainVsRandom";
+    public static final  String          USAGE                        = "Usage: ./pig [(Humans)|(TrainRandom)|(HumanVsRandom (1|2))]";
     private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS = Arrays.asList(RollDicesAction.ROLL1DICE,
             RollDicesAction.ROLL2DICES,
             RollDicesAction.ROLL3DICES,
@@ -55,6 +67,7 @@ class Game
             RollDicesAction.ROLL10DICES);
     private static final double          MAX_REWARD                   = 1000;
     private final EncogInterface                 encogInterface;
+    private final PerceptronConfiguration        perceptronConfiguration;
     private final Function< GameState, Integer > player1Brain;
     private final Function< GameState, Integer > player2Brain;
     private final Random                         random;
@@ -62,42 +75,122 @@ class Game
 
     public
     Game(
-            final PlayerType player1Type,
-            final PlayerType player2Type,
-            final EncogInterface encogInterface
+            @NotNull final PlayerType player1Type,
+            @NotNull final PlayerType player2Type,
+            @NotNull final PerceptronConfiguration perceptronConfiguration,
+            final boolean isAIPlayer1
     ) {
         random = new Random();
-        this.encogInterface = encogInterface;
-        currentGameState = new GameState();
+        this.perceptronConfiguration = perceptronConfiguration;
+        this.encogInterface = perceptronConfiguration.getEncogInterface();
+        currentGameState = new GameState(isAIPlayer1);
         player1Brain = setPlayerType(player1Type);
         player2Brain = setPlayerType(player2Type);
     }
 
     public static
-    void main( final String[] args ) {
-        if ( args[0].contains("Humans") ) {
-            final Game pig = new Game(PlayerType.HUMAN, PlayerType.HUMAN, null);
-            pig.play(true);
-        } else if ( args[0].contains("HumanVsRandom") ) {
-            final int  humanPlayer = Integer.parseInt(args[1]);
-            final Game pig;
-            switch ( humanPlayer ) {
-                case 1:
-                    pig = new Game(PlayerType.HUMAN, PlayerType.RANDOM, null);
-                    break;
-                case 2:
-                    pig = new Game(PlayerType.RANDOM, PlayerType.HUMAN, null);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown human player position. Usage: ./pig HumanVsRandom (1|2)");
-            }
-            pig.play(true);
-        } else if ( args[0].contains("TrainRandom") ) {
-            final Game pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM, null);
-            pig1.train();
-            final Game pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON, null);
-            pig2.train();
-            //TODO continuar!
+    void main( final String[] args )
+            throws Exception {
+        if ( args[0] == null ) {
+            throw new IllegalArgumentException(USAGE);
+        }
+        final Game pig1;
+        final Game pig2;
+        int        gamesToPlay;
+        final int  humanPlayer;
+        final PerceptronConfiguration config = new PerceptronConfiguration("PerceptronVsRandom",
+                new File("../PigPerceptrons/"),
+                new ActivationFunction[] { new ActivationTANH() },
+                1,
+                -1,
+                100,
+                1,
+                true,
+                new int[] { 332, 1 },
+                false,
+                ELearningStyle.AFTER_STATE,
+                new double[] { 0.0025, 0.0025 },
+                0.3,
+                false,
+                1.0,
+                new boolean[] { false, false },
+                true,
+                false);
+        switch ( args[0] ) {
+            case HUMANS:
+                pig1 = new Game(PlayerType.HUMAN, PlayerType.HUMAN, null, true);
+                pig1.play(true);
+                break;
+            case HUMAN_VS_RANDOM:
+                try {
+                    humanPlayer = Integer.parseInt(args[1]);
+                    switch ( humanPlayer ) {
+                        case 1:
+                            pig1 = new Game(PlayerType.HUMAN, PlayerType.RANDOM, null, true);
+                            break;
+                        case 2:
+                            pig1 = new Game(PlayerType.RANDOM, PlayerType.HUMAN, null, true);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unknown human player position. Usage: ./pig " + HUMAN_VS_RANDOM + " (1|2)");
+                    }
+                    pig1.play(true);
+                } catch ( NumberFormatException e ) {
+                    throw new IllegalArgumentException("Unknown human player position. Usage: ./pig " + HUMAN_VS_RANDOM + " (1|2)");
+                }
+                break;
+            case HUMAN_VS_TRAINED:
+                try {
+                    humanPlayer = Integer.parseInt(args[1]);
+                    switch ( humanPlayer ) {
+                        case 1:
+                            pig1 = new Game(PlayerType.HUMAN, PlayerType.PERCEPTRON, config, false);
+                            break;
+                        case 2:
+                            pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.HUMAN, config, true);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unknown human player position. Usage: ./pig " + HUMAN_VS_TRAINED + " (1|2)");
+                    }
+                    pig1.play(true);
+                } catch ( NumberFormatException e ) {
+                    throw new IllegalArgumentException("Unknown human player position. Usage: ./pig " + HUMAN_VS_TRAINED + " (1|2)");
+                }
+                break;
+            case TRAIN_VS_RANDOM:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM, config, true);
+                    pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON, config, false);
+                    train(config, pig1, pig2, gamesToPlay);
+                } catch ( NumberFormatException e ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + TRAIN_VS_RANDOM + " \"number\"");
+                } catch ( IOException e ) {
+                    e.printStackTrace();
+                }
+                break;
+            case SIMULATE_TRAIN_VS_RANDOM:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM, config, true);
+                    pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON, config, false);
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( NumberFormatException e ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAIN_VS_RANDOM + " \"number\"");
+                }
+                break;
+            case SIMULATE_RANDOM:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.RANDOM, PlayerType.RANDOM, null, true);
+                    pig2 = new Game(PlayerType.RANDOM, PlayerType.RANDOM, null, false);
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( NumberFormatException e ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_RANDOM + " \"number\"");
+                }
+                break;
+            default:
+                throw new IllegalArgumentException(USAGE);
         }
     }
 
@@ -138,6 +231,66 @@ class Game
             System.out.println("Resultados de la tirada: " + total);
         }
         return total;
+    }
+
+    private static
+    void simulate(
+            final Game pig1,
+            final Game pig2,
+            final int gamesToPlay
+    ) {
+        double winRate = 0;
+
+        for ( int i = 1; i <= gamesToPlay; i++ ) {
+            pig1.reset();
+            pig1.play(false);
+            if ( pig1.currentGameState.getWinner() == 1 ) {
+                winRate += 1.0d;
+            }
+            pig2.reset();
+            pig2.play(false);
+            if ( pig1.currentGameState.getWinner() == 2 ) {
+                winRate += 1.0d;
+            }
+            if ( i % 100 == 0 ) {
+                final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
+                System.out.println(percent + "%");
+            }
+        }
+        winRate = ( winRate * 100d ) / ( gamesToPlay * 2d );
+        System.out.println("** WinRate = " + winRate);
+    }
+
+    private static
+    void train(
+            final PerceptronConfiguration perceptronConfiguration,
+            final Game pig1,
+            final Game pig2,
+            final int gamesToPlay
+    )
+            throws IOException {
+        TDLambdaLearning learningAlgorithm = new TDLambdaLearning(perceptronConfiguration.getEncogInterface(),
+                perceptronConfiguration.getLearningStyle(),
+                perceptronConfiguration.getAlpha(),
+                perceptronConfiguration.getLambda(),
+                perceptronConfiguration.isReplaceEligibilityTraces(),
+                perceptronConfiguration.getGamma(),
+                perceptronConfiguration.getConcurrencyInLayer(),
+                new Random(),
+                perceptronConfiguration.isCollectStatistics());
+        learningAlgorithm.setFixedLearningRate();
+        learningAlgorithm.setFixedExplorationRate(0);
+        for ( int i = 1; i <= gamesToPlay; i++ ) {
+            pig1.reset();
+            learningAlgorithm.solveAndTrainOnce(pig1, i);
+            pig2.reset();
+            learningAlgorithm.solveAndTrainOnce(pig2, i);
+            if ( i % 100 == 0 ) {
+                final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
+                System.out.println(percent + "%");
+            }
+        }
+        perceptronConfiguration.saveTrainedNeuralNetwork();
     }
 
     /**
@@ -189,7 +342,7 @@ class Game
     IState computeNextTurnStateFromAfterState( final IState afterState ) {
         final GameState finalGameState = (GameState) afterState.getCopy();
         //Computamos todas las acciones estocásticas (incluyendo las del enemigo)
-        if ( finalGameState.isPlayer1() ) {
+        if ( finalGameState.isAIPlayer1() ) {
             //acciones estocásticas del jugador 1
             finalGameState.addPlayer1Score(rollDices(finalGameState.getDicesToRoll(), random, false));
             if ( !finalGameState.isTerminalState() ) {
@@ -269,19 +422,21 @@ class Game
 
     private
     void play( final boolean show ) {
-        System.out.println("Hola Jugamos al Game!!!");
+        if ( show ) {
+            System.out.println("Hola Jugamos al Game!!!");
+        }
         final Random random = new Random();
         random.setSeed(System.currentTimeMillis());
         while ( !currentGameState.isTerminalState() ) {
             if ( show ) {
-                if ( currentGameState.isPlayer1() ) {
+                if ( currentGameState.isAIPlayer1() ) {
                     System.out.println("======== Turno del jugador 1 ========");
                 } else {
                     System.out.println("======== Turno del jugador 2 ========");
                 }
                 System.out.println("¿Cuántos dados desea tirar (1 a 10)?: ");
             }
-            if ( currentGameState.isPlayer1() ) {
+            if ( currentGameState.isAIPlayer1() ) {
                 // entrada del jugador 1
                 currentGameState.setDicesToRoll(player1Brain.apply(currentGameState));
                 // tiramos dados y calculamos puntaje
@@ -306,12 +461,17 @@ class Game
         }
         if ( show ) {
             System.out.println("==========================================");
-            if ( currentGameState.isPlayer1() ) {
+            if ( currentGameState.isAIPlayer1() ) {
                 System.out.println("Gana el jugador 1 con " + currentGameState.getPlayer1Score() + " puntos");
             } else {
                 System.out.println("Gana el jugador 2 con " + currentGameState.getPlayer2Score() + " puntos");
             }
         }
+    }
+
+    private
+    void reset() {
+        currentGameState.reset();
     }
 
     @Override
@@ -330,16 +490,27 @@ class Game
             case GREEDY:
                 return ( gameState ) -> 10;
             case PERCEPTRON:
-                //return (state) -> 10;
-                throw new UnsupportedOperationException("Not implemented yet");
+                return ( gameState ) -> {
+                    // evaluamos cada acción aplicada al estado inicial y elegimos la mejor
+                    // acción basada en las predicciones del problema
+                    return ( (RollDicesAction) TDLambdaLearning.computeBestPossibleAction(this,
+                            perceptronConfiguration.getLearningStyle(),
+                            gameState,
+                            LIST_OF_ALL_POSSIBLE_ACTIONS,
+                            perceptronConfiguration.isComputeParallelBestPossibleAction(),
+                            random,
+                            null).getAction() ).getNumVal();
+                };
             default:
                 throw new UnsupportedOperationException("Not implemented yet");
         }
     }
 
-    private
-    void train() {
-
+    @Override
+    public
+    String toString() {
+        return "Game{" + "encogInterface=" + encogInterface + ", player1Brain=" + player1Brain + ", player2Brain=" + player2Brain +
+               ", currentGameState=" + currentGameState + '}';
     }
 
     public
@@ -348,12 +519,5 @@ class Game
         RANDOM,
         GREEDY,
         PERCEPTRON
-    }
-
-    @Override
-    public
-    String toString() {
-        return "Game{" + "encogInterface=" + encogInterface + ", player1Brain=" + player1Brain + ", player2Brain=" + player2Brain +
-               ", currentGameState=" + currentGameState + '}';
     }
 }

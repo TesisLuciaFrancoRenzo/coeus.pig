@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2017  Lucia Bressan <lucyluz333@gmial.com>,
+ *                     Franco Pellegrini <francogpellegrini@gmail.com>,
+ *                     Renzo Bianchini <renzobianchini85@gmail.com
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package ar.edu.unrc.coeus.pig;
 
 import ar.edu.unrc.coeus.interfaces.INeuralNetworkInterface;
@@ -8,6 +27,7 @@ import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.engine.network.activation.ActivationTANH;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
+import org.encog.util.arrayutil.NormalizationAction;
 import org.encog.util.arrayutil.NormalizedField;
 import org.encog.util.obj.SerializeObject;
 
@@ -22,6 +42,8 @@ public
 class EncogInterface
         implements INeuralNetworkInterface {
     private final boolean concurrentInput;
+    private final double  maxReward;
+    private final double  minReward;
     private List< Function< Double, Double > > activationFunction         = null;
     private ActivationFunction[]               activationFunctionForEncog = null;
     private double                             activationFunctionMax      = 0.0;
@@ -30,7 +52,6 @@ class EncogInterface
     private boolean                            hasBias                    = true;
     private BasicNetwork neuralNetwork;
     private int[]           neuronQuantityInLayer = null;
-    private NormalizedField normInput             = null;
     private NormalizedField normOutput            = null;
 
     public
@@ -38,24 +59,22 @@ class EncogInterface
             final ActivationFunction[] encogActivationFunctions,
             final double activationFunctionMax,
             final double activationFunctionMin,
+            final double maxReward,
+            final double minReward,
             final boolean hasBias,
             final int[] neuronQuantityInLayer,
-            final boolean concurrentInput,
-            final NormalizedField normInput,
-            final NormalizedField normOutput,
-            final BasicNetwork neuralNetwork
+            final boolean concurrentInput
     ) {
         activationFunctionForEncog = encogActivationFunctions;
         activationFunction = new ArrayList<>(encogActivationFunctions.length);
         derivedActivationFunction = new ArrayList<>(encogActivationFunctions.length);
+        this.maxReward = maxReward;
+        this.minReward = minReward;
         this.activationFunctionMax = activationFunctionMax;
         this.activationFunctionMin = activationFunctionMin;
         this.hasBias = hasBias;
         this.neuronQuantityInLayer = neuronQuantityInLayer;
         this.concurrentInput = concurrentInput;
-        this.normInput = normInput;
-        this.normOutput = normOutput;
-        this.neuralNetwork = neuralNetwork;
         for ( final ActivationFunction activationFunctionForEncog : encogActivationFunctions ) {
             if ( activationFunctionForEncog instanceof ActivationTANH ) {
                 activationFunction.add(FunctionUtils.TANH);
@@ -70,6 +89,7 @@ class EncogInterface
                 throw new IllegalArgumentException("El test esta pensado para utilizar TANH, Sigmoid o Linear como función de activación");
             }
         }
+        normOutput = new NormalizedField(NormalizationAction.Normalize, null, maxReward, minReward, activationFunctionMax, activationFunctionMin);
     }
 
     public
@@ -134,6 +154,16 @@ class EncogInterface
     }
 
     public
+    double getMaxReward() {
+        return maxReward;
+    }
+
+    public
+    double getMinReward() {
+        return minReward;
+    }
+
+    public
     BasicNetwork getNeuralNetwork() {
         return neuralNetwork;
     }
@@ -147,16 +177,6 @@ class EncogInterface
     public
     int getNeuronQuantityInLayer( final int layerIndex ) {
         return neuralNetwork.getLayerNeuronCount(layerIndex);
-    }
-
-    public
-    NormalizedField getNormInput() {
-        return normInput;
-    }
-
-    public
-    NormalizedField getNormOutput() {
-        return normOutput;
     }
 
     @Override
@@ -285,7 +305,7 @@ class EncogInterface
         return "EncogInterface{" + "concurrentInput=" + concurrentInput + ", activationFunction=" + activationFunction +
                ", activationFunctionForEncog=" + Arrays.toString(activationFunctionForEncog) + ", activationFunctionMax=" + activationFunctionMax +
                ", activationFunctionMin=" + activationFunctionMin + ", derivedActivationFunction=" + derivedActivationFunction + ", hasBias=" +
-               hasBias + ", neuralNetwork=" + neuralNetwork + ", neuronQuantityInLayer=" + Arrays.toString(neuronQuantityInLayer) + ", normInput=" +
-               normInput + ", normOutput=" + normOutput + '}';
+               hasBias + ", neuralNetwork=" + neuralNetwork + ", neuronQuantityInLayer=" + Arrays.toString(neuronQuantityInLayer) + ", normOutput=" +
+               normOutput + '}';
     }
 }

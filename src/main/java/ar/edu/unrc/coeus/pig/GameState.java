@@ -29,25 +29,40 @@ public final
 class GameState
         implements IStatePerceptron {
 
+    /**
+     * neuronas 320-329
+     */
     private int     dicesToRoll;
-    private boolean isPlayer1;
+    /**
+     * neuronas 330-331
+     */
+    private boolean isAIPlayer1;
+    /**
+     * neuronas 0-159
+     */
     private int     player1Score;
+    /**
+     * neuronas 160-319
+     */
     private int     player2Score;
 
     public
-    GameState() {
+    GameState(
+            final boolean isAIPlayer1
+    ) {
         reset();
+        this.isAIPlayer1 = isAIPlayer1;
     }
 
     public
     GameState(
             final int dicesToRoll,
-            final boolean isPlayer1,
+            final boolean isAIPlayer1,
             final int player1Score,
             final int player2Score
     ) {
         this.dicesToRoll = dicesToRoll;
-        this.isPlayer1 = isPlayer1;
+        this.isAIPlayer1 = isAIPlayer1;
         this.player1Score = player1Score;
         this.player2Score = player2Score;
     }
@@ -65,7 +80,7 @@ class GameState
     @Override
     public
     IState getCopy() {
-        return new GameState(dicesToRoll, isPlayer1, player1Score, player2Score);
+        return new GameState(dicesToRoll, isAIPlayer1, player1Score, player2Score);
     }
 
     public
@@ -76,6 +91,18 @@ class GameState
     public
     void setDicesToRoll( final int dicesToRoll ) {
         this.dicesToRoll = dicesToRoll;
+    }
+
+    /**
+     * @return 0 = Sin ganador, o puntaje del perdedor
+     */
+    public
+    int getLooserScore() {
+        if ( isTerminalState() ) {
+            return ( player1Score >= 100 ) ? player2Score : player1Score;
+        } else {
+            return 0;
+        }
     }
 
     public
@@ -94,9 +121,33 @@ class GameState
         return dicesToRoll;
     }
 
+    /**
+     * @return 0 = Sin ganador, 1 = jugador 1, 2 = jugador 2.
+     */
     public
-    boolean isPlayer1() {
-        return isPlayer1;
+    int getWinner() {
+        if ( isTerminalState() ) {
+            return ( player1Score >= 100 ) ? 1 : 2;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * @return 0 = Sin ganador, o puntaje del ganador
+     */
+    public
+    int getWinnerScore() {
+        if ( isTerminalState() ) {
+            return ( player1Score >= 100 ) ? player1Score : player2Score;
+        } else {
+            return 0;
+        }
+    }
+
+    public
+    boolean isAIPlayer1() {
+        return isAIPlayer1;
     }
 
     @Override
@@ -108,26 +159,40 @@ class GameState
     public
     void reset() {
         dicesToRoll = 0;
-        isPlayer1 = true;
         player1Score = 0;
         player2Score = 0;
     }
 
     public
     void swapPlayers() {
-        isPlayer1 = !isPlayer1;
+        isAIPlayer1 = !isAIPlayer1;
     }
 
     @Override
     public
     String toString() {
-        return "GameState{" + "dicesToRoll=" + dicesToRoll + ", isPlayer1=" + isPlayer1 + ", player1Score=" + player1Score + ", player2Score=" +
+        return "GameState{" + "dicesToRoll=" + dicesToRoll + ", isAIPlayer1=" + isAIPlayer1 + ", player1Score=" + player1Score + ", player2Score=" +
                player2Score + '}';
     }
 
     @Override
     public
     Double translateToPerceptronInput( final int neuronIndex ) {
-        return null;
+        if ( neuronIndex <= 159 ) {
+            return ( neuronIndex == player1Score ) ? 1d : 0d;
+        }
+        if ( ( neuronIndex >= 160 ) && ( neuronIndex <= 319 ) ) {
+            return ( ( neuronIndex - 160 ) == player2Score ) ? 1d : 0d;
+        }
+        if ( ( neuronIndex >= 320 ) && ( neuronIndex <= 329 ) ) {
+            return ( ( neuronIndex - 320 ) == dicesToRoll ) ? 1d : 0d;
+        }
+        if ( neuronIndex == 330 ) {
+            return isAIPlayer1 ? 1d : 0d;
+        }
+        if ( neuronIndex == 331 ) {
+            return isAIPlayer1 ? 0d : 1d;
+        }
+        throw new IllegalStateException("unrecognized neuron number " + neuronIndex);
     }
 }
