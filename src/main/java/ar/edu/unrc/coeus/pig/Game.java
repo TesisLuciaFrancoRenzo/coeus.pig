@@ -52,7 +52,9 @@ class Game
     public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
     public static final  String          HUMAN_VS_TRAINED             = "HumanVsTrained";
     public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
+    public static final  String          SIMULATE_TRAINED_VS_ITSELF   = "SimulateTrainedVsItself";
     public static final  String          SIMULATE_TRAINED_VS_RANDOM   = "SimulateTrainedVsRandom";
+    public static final  String          TRAIN_VS_ITSELF              = "TrainVsItself";
     public static final  String          TRAIN_VS_RANDOM              = "TrainVsRandom";
     public static final  String          USAGE                        = "Usage: ./pig [(Humans)|(TrainRandom)|(HumanVsRandom (1|2))]";
     private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS = Arrays.asList(RollDicesAction.ROLL1DICE,
@@ -105,9 +107,7 @@ class Game
         final PerceptronConfiguration config = new PerceptronConfiguration("PerceptronVsRandom",
                 new File("../PigPerceptrons/"),
                 new ActivationFunction[] { new ActivationTANH() },
-                1,
-                -1,
-                100, -100,
+                1, -1, 100, -100,
                 true,
                 new int[] { 332, 1 },
                 false,
@@ -183,6 +183,30 @@ class Game
                     simulate(pig1, pig2, gamesToPlay);
                 } catch ( NumberFormatException e ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAINED_VS_RANDOM + " \"number\"");
+                }
+                break;
+            case TRAIN_VS_ITSELF:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.PERCEPTRON, config, true);
+                    pig2 = new Game(PlayerType.PERCEPTRON, PlayerType.PERCEPTRON, config, false);
+                    config.newPerceptronToTrain();
+                    train(config, pig1, pig2, gamesToPlay);
+                } catch ( NumberFormatException e ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + TRAIN_VS_ITSELF + " \"number\"");
+                } catch ( IOException e ) {
+                    e.printStackTrace();
+                }
+                break;
+            case SIMULATE_TRAINED_VS_ITSELF:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.PERCEPTRON, config, true);
+                    pig2 = new Game(PlayerType.PERCEPTRON, PlayerType.PERCEPTRON, config, false);
+                    config.loadTrainedPerceptron();
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( NumberFormatException e ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAINED_VS_ITSELF + " \"number\"");
                 }
                 break;
             case SIMULATE_RANDOM:
