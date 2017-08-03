@@ -58,14 +58,16 @@ class GameState
             final int dicesToRoll,
             final boolean isAIPlayer1,
             final int player1Score,
-            final int player2Score
+            final int player2Score,
+            final int player1TotalReward,
+            final int player2TotalReward
     ) {
         this.dicesToRoll = dicesToRoll;
         this.isAIPlayer1 = isAIPlayer1;
         this.player1Score = player1Score;
         this.player2Score = player2Score;
-        this.player1TotalReward = 0;
-        this.player2TotalReward = 0;
+        this.player1TotalReward = player1TotalReward;
+        this.player2TotalReward = player2TotalReward;
     }
 
     public
@@ -83,7 +85,7 @@ class GameState
     @Override
     public
     IState getCopy() {
-        return new GameState(dicesToRoll, isAIPlayer1, player1Score, player2Score);
+        return new GameState(dicesToRoll, isAIPlayer1, player1Score, player2Score, player1TotalReward, player2TotalReward);
     }
 
     public

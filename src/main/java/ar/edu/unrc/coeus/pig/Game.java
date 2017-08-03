@@ -119,9 +119,7 @@ class Game
                         true,
                         new int[] { 322, 1 },
                         false,
-                        ELearningStyle.AFTER_STATE,
-                        new double[] { 0.0025, 0.0025 },
-                        0.3,
+                        ELearningStyle.AFTER_STATE, new double[] { 0.005, 0.005 }, 0.5,
                         false,
                         1.0,
                         new boolean[] { false, false },
@@ -410,7 +408,7 @@ class Game
                 new Random(),
                 perceptronConfiguration.isCollectStatistics());
         learningAlgorithm.setFixedLearningRate();
-        learningAlgorithm.setFixedExplorationRate(0.1);
+        learningAlgorithm.setFixedExplorationRate(0);
         for ( int i = 1; i <= gamesToPlay; i++ ) {
             pig1.reset();
             learningAlgorithm.solveAndTrainOnce(pig1, i);
