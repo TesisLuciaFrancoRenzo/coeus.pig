@@ -52,9 +52,13 @@ class Game
     public static final  String          HUMANS                       = "Humans";
     public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
     public static final  String          HUMAN_VS_TRAINED             = "HumanVsTrained";
+    public static final  String          SIMULATE_GREEDY              = "SimulateGreedy";
+    public static final  String          SIMULATE_INITIAL             = "SimulateInitial";
     public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
+    public static final  String          SIMULATE_TRAINED_VS_GREEDY   = "SimulateTrainedVsGreedy";
     public static final  String          SIMULATE_TRAINED_VS_ITSELF   = "SimulateTrainedVsItself";
     public static final  String          SIMULATE_TRAINED_VS_RANDOM   = "SimulateTrainedVsRandom";
+    public static final  String          TRAIN_VS_GREEDY              = "TrainVsGreedy";
     public static final  String          TRAIN_VS_ITSELF              = "TrainVsItself";
     public static final  String          TRAIN_VS_RANDOM              = "TrainVsRandom";
     public static final  String          USAGE                        = "Usage: ./pig [(Humans)|(TrainRandom)|(HumanVsRandom (1|2))]";
@@ -101,15 +105,23 @@ class Game
         final Game pig2;
         final int  gamesToPlay;
         final int  humanPlayer;
-        final PerceptronConfiguration config = new PerceptronConfiguration("PerceptronVsRandom",
-                new File("../PigPerceptrons/"), new ActivationFunction[] { new ActivationTANH() }, 1, -1, 100, -100,
+        final PerceptronConfiguration config = new PerceptronConfiguration("PigPerceptron",
+                new File("../PigPerceptrons/"),
+                new ActivationFunction[] { new ActivationTANH() },
+                1,
+                -1,
+                100,
+                -100,
                 true,
                 new int[] { 332, 1 },
                 false,
                 ELearningStyle.AFTER_STATE,
                 new double[] { 0.0025, 0.0025 },
                 0.3,
-                false, 1.0, new boolean[] { false, false }, false,
+                true,
+                1.0,
+                new boolean[] { false, false },
+                false,
                 false);
         switch ( args[0] ) {
             case HUMANS:
@@ -201,6 +213,30 @@ class Game
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAINED_VS_ITSELF + " \"number\"");
                 }
                 break;
+            case TRAIN_VS_GREEDY:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.GREEDY, config, true);
+                    pig2 = new Game(PlayerType.GREEDY, PlayerType.PERCEPTRON, config, false);
+                    config.newPerceptronToTrain();
+                    train(config, pig1, pig2, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + TRAIN_VS_GREEDY + " \"number\"");
+                } catch ( final IOException e ) {
+                    e.printStackTrace();
+                }
+                break;
+            case SIMULATE_TRAINED_VS_GREEDY:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.GREEDY, config, true);
+                    pig2 = new Game(PlayerType.GREEDY, PlayerType.PERCEPTRON, config, false);
+                    config.loadTrainedPerceptron();
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAINED_VS_GREEDY + " \"number\"");
+                }
+                break;
             case SIMULATE_RANDOM:
                 try {
                     gamesToPlay = Integer.parseInt(args[1]);
@@ -209,6 +245,27 @@ class Game
                     simulate(pig1, pig2, gamesToPlay);
                 } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_RANDOM + " \"number\"");
+                }
+                break;
+            case SIMULATE_INITIAL:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM, config, true);
+                    pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON, config, false);
+                    config.loadInitialPerceptron();
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_INITIAL + " \"number\"");
+                }
+                break;
+            case SIMULATE_GREEDY:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.GREEDY, PlayerType.GREEDY, null, true);
+                    pig2 = new Game(PlayerType.GREEDY, PlayerType.GREEDY, null, false);
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_GREEDY + " \"number\"");
                 }
                 break;
             default:
@@ -284,7 +341,7 @@ class Game
             }
         }
         double winRate = ( wins * 100d ) / ( gamesToPlay * 2d );
-        System.out.println(new Date() + " == WinRate = " + winRate + " (" + wins + "/" + gamesToPlay + ")");
+        System.out.println(new Date() + " == WinRate = " + winRate + " (" + wins + "/" + ( gamesToPlay * 2 ) + ")");
     }
 
     /**
@@ -314,7 +371,7 @@ class Game
                 new Random(),
                 perceptronConfiguration.isCollectStatistics());
         learningAlgorithm.setFixedLearningRate();
-        learningAlgorithm.setFixedExplorationRate(0);
+        learningAlgorithm.setFixedExplorationRate(0.1);
         for ( int i = 1; i <= gamesToPlay; i++ ) {
             pig1.reset();
             learningAlgorithm.solveAndTrainOnce(pig1, i);
@@ -557,3 +614,4 @@ class Game
         PERCEPTRON
     }
 }
+

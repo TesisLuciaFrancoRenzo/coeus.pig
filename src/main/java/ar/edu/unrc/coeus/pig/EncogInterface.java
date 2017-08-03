@@ -42,8 +42,6 @@ public
 class EncogInterface
         implements INeuralNetworkInterface {
     private final boolean concurrentInput;
-    private final double  maxReward;
-    private final double  minReward;
     private List< Function< Double, Double > > activationFunction         = null;
     private ActivationFunction[]               activationFunctionForEncog = null;
     private double                             activationFunctionMax      = 0.0;
@@ -68,8 +66,6 @@ class EncogInterface
         activationFunctionForEncog = encogActivationFunctions;
         activationFunction = new ArrayList<>(encogActivationFunctions.length);
         derivedActivationFunction = new ArrayList<>(encogActivationFunctions.length);
-        this.maxReward = maxReward;
-        this.minReward = minReward;
         this.activationFunctionMax = activationFunctionMax;
         this.activationFunctionMin = activationFunctionMin;
         this.hasBias = hasBias;
@@ -95,6 +91,21 @@ class EncogInterface
     public
     boolean containBias() {
         return hasBias;
+    }
+
+    /**
+     * @param perceptronFile       archivo con la red neuronal.
+     * @param randomizedIfNotExist true si debe inicializar al azar los pesos y bias al crear una nueva red neuronal.
+     */
+    public
+    void createPerceptron(
+            final File perceptronFile,
+            final boolean randomizedIfNotExist
+    )
+            throws IOException, ClassNotFoundException {
+        //Si el archivo no existe, creamos un perceptron nuevo inicializado al azar
+        neuralNetwork = initializeEncogPerceptron(randomizedIfNotExist);
+        SerializeObject.save(perceptronFile, neuralNetwork);
     }
 
     public
@@ -202,29 +213,14 @@ class EncogInterface
     /**
      * Carga desde un archivo una red neuronal, o crea una nueva (con valores al azar o con valores por defecto).
      *
-     * @param perceptronFile       archivo con la red neuronal.
-     * @param randomizedIfNotExist true si debe inicializar al azar los pesos y bias al crear una nueva red neuronal.
-     * @param createFile           true si debe crear una nueva red neuronal.
+     * @param perceptronFile archivo con la red neuronal.
      */
     public
-    void loadOrCreatePerceptron(
-            final File perceptronFile,
-            final boolean randomizedIfNotExist,
-            final boolean createFile
+    void loadPerceptron(
+            final File perceptronFile
     )
             throws IOException, ClassNotFoundException {
-        if ( createFile ) {
-            if ( perceptronFile.exists() ) {
-                //si el archivo existe, lo cargamos como perceptron entrenado al juego
-                neuralNetwork = (BasicNetwork) SerializeObject.load(perceptronFile);
-            } else {
-                //Si el archivo no existe, creamos un perceptron nuevo inicializado al azar
-                neuralNetwork = initializeEncogPerceptron(randomizedIfNotExist);
-                SerializeObject.save(perceptronFile, neuralNetwork);
-            }
-        } else {
-            neuralNetwork = initializeEncogPerceptron(randomizedIfNotExist);
-        }
+        neuralNetwork = (BasicNetwork) SerializeObject.load(perceptronFile);
     }
 
     public

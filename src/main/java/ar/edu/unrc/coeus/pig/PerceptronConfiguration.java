@@ -134,9 +134,15 @@ class PerceptronConfiguration {
     }
 
     public
+    void loadInitialPerceptron()
+            throws IOException, ClassNotFoundException {
+        encogInterface.loadPerceptron(originalFile);
+    }
+
+    public
     void loadTrainedPerceptron()
             throws IOException, ClassNotFoundException {
-        encogInterface.loadOrCreatePerceptron(trainedFile, false, true);
+        encogInterface.loadPerceptron(trainedFile);
     }
 
     public
@@ -148,7 +154,7 @@ class PerceptronConfiguration {
         if ( trainedFile.exists() ) {
             trainedFile.delete();
         }
-        encogInterface.loadOrCreatePerceptron(originalFile, false, true);
+        encogInterface.createPerceptron(originalFile, false);
     }
 
     public
