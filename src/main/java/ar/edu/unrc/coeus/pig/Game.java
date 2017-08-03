@@ -46,20 +46,23 @@ import java.util.stream.IntStream;
 public
 class Game
         implements IProblemToTrain {
-    public static final  String          HUMANS                       = "Humans";
-    public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
-    public static final  String          HUMAN_VS_TRAINED             = "HumanVsTrained";
-    public static final  String          SIMULATE_GREEDY              = "SimulateGreedy";
-    public static final  String          SIMULATE_INITIAL_VS_GREEDY   = "SimulateInitialVsGreedy";
-    public static final  String          SIMULATE_INITIAL_VS_RANDOM   = "SimulateInitialVsRandom";
-    public static final  String          SIMULATE_LAZY                = "SimulateLazy";
-    public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
-    public static final  String          SIMULATE_TRAINED_VS_GREEDY   = "SimulateTrainedVsGreedy";
-    public static final  String          SIMULATE_TRAINED_VS_ITSELF   = "SimulateTrainedVsItself";
-    public static final  String          SIMULATE_TRAINED_VS_RANDOM   = "SimulateTrainedVsRandom";
-    public static final  String          TRAIN_VS_GREEDY              = "TrainVsGreedy";
-    public static final  String          TRAIN_VS_ITSELF              = "TrainVsItself";
-    public static final  String          TRAIN_VS_RANDOM              = "TrainVsRandom";
+    public static final String HUMANS                     = "Humans";
+    public static final String HUMAN_VS_RANDOM            = "HumanVsRandom";
+    public static final String HUMAN_VS_TRAINED           = "HumanVsTrained";
+    public static final String SIMULATE_GREEDY            = "SimulateGreedy";
+    public static final String SIMULATE_GREEDY_VS_LAZY    = "SimulateGreedyVsLazy";
+    public static final String SIMULATE_INITIAL_VS_GREEDY = "SimulateInitialVsGreedy";
+    public static final String SIMULATE_INITIAL_VS_RANDOM = "SimulateInitialVsRandom";
+    public static final String SIMULATE_LAZY              = "SimulateLazy";
+    public static final String SIMULATE_RANDOM            = "SimulateRandom";
+    public static final String SIMULATE_RANDOM_VS_GREEDY  = "SimulateRandomVsGreedy";
+    public static final String SIMULATE_RANDOM_VS_LAZY    = "SimulateRandomVsLazy";
+    public static final String SIMULATE_TRAINED_VS_GREEDY = "SimulateTrainedVsGreedy";
+    public static final String SIMULATE_TRAINED_VS_ITSELF = "SimulateTrainedVsItself";
+    public static final String SIMULATE_TRAINED_VS_RANDOM = "SimulateTrainedVsRandom";
+    public static final String TRAIN_VS_GREEDY            = "TrainVsGreedy";
+    public static final String TRAIN_VS_ITSELF            = "TrainVsItself";
+    public static final String TRAIN_VS_RANDOM            = "TrainVsRandom";
     public static final  String          USAGE                        = "Usage: ./pig [(Humans)|(TrainRandom)|(HumanVsRandom (1|2))]";
     private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS = Arrays.asList(RollDicesAction.ROLL1DICE,
             RollDicesAction.ROLL2DICES,
@@ -104,19 +107,25 @@ class Game
         final Game pig2;
         final int  gamesToPlay;
         final int  humanPlayer;
-        final PerceptronConfiguration config =
-                new PerceptronConfiguration("PigPerceptron",
-                        new File("../PigPerceptrons/"),
-                        new ActivationFunction[] { new ActivationTANH() },
-                        //FIXME esta bien?
-                        1,
-                        -1,
-                        250, -250, false, new int[] { 322, 1 }, false, ELearningStyle.AFTER_STATE, new double[] { 0.0025, 0.0025 }, 0,
-                        false,
-                        1.0,
-                        new boolean[] { false, false },
-                        false,
-                        false);
+        final PerceptronConfiguration config = new PerceptronConfiguration("PigPerceptron",
+                new File("../PigPerceptrons/"),
+                new ActivationFunction[] { new ActivationTANH(), new ActivationTANH() },
+                //FIXME esta bien?
+                1,
+                -1,
+                250,
+                -250,
+                false,
+                new int[] { 322, 1 },
+                false,
+                ELearningStyle.AFTER_STATE,
+                new double[] { 0.0025, 0.0025 },
+                0,
+                false,
+                1.0,
+                new boolean[] { false, false },
+                false,
+                false);
         switch ( args[0] ) {
             case HUMANS:
                 pig1 = new Game(PlayerType.HUMAN, PlayerType.HUMAN, null, true);
@@ -239,6 +248,36 @@ class Game
                     simulate(pig1, pig2, gamesToPlay);
                 } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_RANDOM + " \"number\"");
+                }
+                break;
+            case SIMULATE_RANDOM_VS_GREEDY:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.RANDOM, PlayerType.GREEDY, null, true);
+                    pig2 = new Game(PlayerType.GREEDY, PlayerType.RANDOM, null, false);
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_RANDOM_VS_GREEDY + " \"number\"");
+                }
+                break;
+            case SIMULATE_RANDOM_VS_LAZY:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.RANDOM, PlayerType.LAZY, null, true);
+                    pig2 = new Game(PlayerType.LAZY, PlayerType.RANDOM, null, false);
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_RANDOM_VS_LAZY + " \"number\"");
+                }
+                break;
+            case SIMULATE_GREEDY_VS_LAZY:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig1 = new Game(PlayerType.GREEDY, PlayerType.LAZY, null, true);
+                    pig2 = new Game(PlayerType.LAZY, PlayerType.GREEDY, null, false);
+                    simulate(pig1, pig2, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_GREEDY_VS_LAZY + " \"number\"");
                 }
                 break;
             case SIMULATE_LAZY:
