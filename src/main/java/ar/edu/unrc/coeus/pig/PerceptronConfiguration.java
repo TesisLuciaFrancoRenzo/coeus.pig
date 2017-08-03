@@ -33,12 +33,10 @@ class PerceptronConfiguration {
     private final boolean        computeParallelBestPossibleAction;
     private final boolean[]      concurrencyInLayer;
     private final EncogInterface encogInterface;
-    private final String         experimentName;
     private final double         gamma;
     private final double         lambda;
     private final ELearningStyle learningStyle;
     private final File           originalFile;
-    private final File           pathToFile;
     private final boolean        replaceEligibilityTraces;
     private final File           trainedFile;
 
@@ -64,21 +62,11 @@ class PerceptronConfiguration {
             final boolean collectStatistics
     )
             throws IOException, ClassNotFoundException {
-        this.experimentName = experimentName;
         if ( !pathToFile.exists() ) {
             pathToFile.mkdirs();
         }
         if ( !pathToFile.isDirectory() ) {
             throw new IllegalArgumentException("pathToFile must be a directory");
-        }
-        this.pathToFile = pathToFile;
-        originalFile = new File(pathToFile.getCanonicalPath() + File.separator + experimentName + "_Original.ser");
-        if ( originalFile.exists() ) {
-            originalFile.delete();
-        }
-        trainedFile = new File(pathToFile.getCanonicalPath() + File.separator + experimentName + "_Trained.ser");
-        if ( trainedFile.exists() ) {
-            trainedFile.delete();
         }
         encogInterface = new EncogInterface(encogActivationFunctions,
                 activationFunctionMax,
@@ -88,7 +76,8 @@ class PerceptronConfiguration {
                 hasBias,
                 neuronQuantityInLayer,
                 concurrentInput);
-        encogInterface.loadOrCreatePerceptron(originalFile, false, true);
+        originalFile = new File(pathToFile.getCanonicalPath() + File.separator + experimentName + "_Original.ser");
+        trainedFile = new File(pathToFile.getCanonicalPath() + File.separator + experimentName + "_Trained.ser");
         this.computeParallelBestPossibleAction = computeParallelBestPossibleAction;
         this.learningStyle = learningStyle;
         this.alpha = alpha;
@@ -115,11 +104,6 @@ class PerceptronConfiguration {
     }
 
     public
-    String getExperimentName() {
-        return experimentName;
-    }
-
-    public
     double getGamma() {
         return gamma;
     }
@@ -135,11 +119,6 @@ class PerceptronConfiguration {
     }
 
     public
-    File getPathToFile() {
-        return pathToFile;
-    }
-
-    public
     boolean isCollectStatistics() {
         return collectStatistics;
     }
@@ -152,6 +131,24 @@ class PerceptronConfiguration {
     public
     boolean isReplaceEligibilityTraces() {
         return replaceEligibilityTraces;
+    }
+
+    public
+    void loadTrainedPerceptron()
+            throws IOException, ClassNotFoundException {
+        encogInterface.loadOrCreatePerceptron(trainedFile, false, true);
+    }
+
+    public
+    void newPerceptronToTrain()
+            throws IOException, ClassNotFoundException {
+        if ( originalFile.exists() ) {
+            originalFile.delete();
+        }
+        if ( trainedFile.exists() ) {
+            trainedFile.delete();
+        }
+        encogInterface.loadOrCreatePerceptron(originalFile, false, true);
     }
 
     public

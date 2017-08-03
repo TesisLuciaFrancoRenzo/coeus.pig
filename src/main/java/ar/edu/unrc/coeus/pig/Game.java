@@ -52,7 +52,7 @@ class Game
     public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
     public static final  String          HUMAN_VS_TRAINED             = "HumanVsTrained";
     public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
-    public static final  String          SIMULATE_TRAIN_VS_RANDOM     = "SimulateTrainVsRandom";
+    public static final  String          SIMULATE_TRAINED_VS_RANDOM   = "SimulateTrainedVsRandom";
     public static final  String          TRAIN_VS_RANDOM              = "TrainVsRandom";
     public static final  String          USAGE                        = "Usage: ./pig [(Humans)|(TrainRandom)|(HumanVsRandom (1|2))]";
     private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS = Arrays.asList(RollDicesAction.ROLL1DICE,
@@ -77,12 +77,16 @@ class Game
     Game(
             @NotNull final PlayerType player1Type,
             @NotNull final PlayerType player2Type,
-            @NotNull final PerceptronConfiguration perceptronConfiguration,
+            final PerceptronConfiguration perceptronConfiguration,
             final boolean isAIPlayer1
     ) {
         random = new Random();
         this.perceptronConfiguration = perceptronConfiguration;
-        this.encogInterface = perceptronConfiguration.getEncogInterface();
+        if ( perceptronConfiguration != null ) {
+            this.encogInterface = perceptronConfiguration.getEncogInterface();
+        } else {
+            this.encogInterface = null;
+        }
         currentGameState = new GameState(isAIPlayer1);
         player1Brain = setPlayerType(player1Type);
         player2Brain = setPlayerType(player2Type);
@@ -103,8 +107,7 @@ class Game
                 new ActivationFunction[] { new ActivationTANH() },
                 1,
                 -1,
-                100,
-                1,
+                100, -100,
                 true,
                 new int[] { 332, 1 },
                 false,
@@ -152,6 +155,7 @@ class Game
                         default:
                             throw new IllegalArgumentException("Unknown human player position. Usage: ./pig " + HUMAN_VS_TRAINED + " (1|2)");
                     }
+                    config.loadTrainedPerceptron();
                     pig1.play(true);
                 } catch ( NumberFormatException e ) {
                     throw new IllegalArgumentException("Unknown human player position. Usage: ./pig " + HUMAN_VS_TRAINED + " (1|2)");
@@ -162,6 +166,7 @@ class Game
                     gamesToPlay = Integer.parseInt(args[1]);
                     pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM, config, true);
                     pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON, config, false);
+                    config.newPerceptronToTrain();
                     train(config, pig1, pig2, gamesToPlay);
                 } catch ( NumberFormatException e ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + TRAIN_VS_RANDOM + " \"number\"");
@@ -169,14 +174,15 @@ class Game
                     e.printStackTrace();
                 }
                 break;
-            case SIMULATE_TRAIN_VS_RANDOM:
+            case SIMULATE_TRAINED_VS_RANDOM:
                 try {
                     gamesToPlay = Integer.parseInt(args[1]);
                     pig1 = new Game(PlayerType.PERCEPTRON, PlayerType.RANDOM, config, true);
                     pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON, config, false);
+                    config.loadTrainedPerceptron();
                     simulate(pig1, pig2, gamesToPlay);
                 } catch ( NumberFormatException e ) {
-                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAIN_VS_RANDOM + " \"number\"");
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAINED_VS_RANDOM + " \"number\"");
                 }
                 break;
             case SIMULATE_RANDOM:
