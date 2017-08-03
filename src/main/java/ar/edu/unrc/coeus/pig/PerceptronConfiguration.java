@@ -42,26 +42,26 @@ class PerceptronConfiguration {
 
     public
     PerceptronConfiguration(
-            @NotNull final String experimentName,
-            @NotNull final File pathToFile,
-            @NotNull final ActivationFunction[] encogActivationFunctions,
+            final @NotNull String experimentName,
+            final @NotNull File pathToFile,
+            final @NotNull ActivationFunction[] encogActivationFunctions,
             final double activationFunctionMax,
             final double activationFunctionMin,
             final double maxReward,
             final double minReward,
             final boolean hasBias,
-            @NotNull final int[] neuronQuantityInLayer,
+            final @NotNull int[] neuronQuantityInLayer,
             final boolean concurrentInput,
             final ELearningStyle learningStyle,
-            @NotNull final double[] alpha,
+            final @NotNull double[] alpha,
             final double lambda,
             final boolean replaceEligibilityTraces,
             final double gamma,
-            @NotNull final boolean[] concurrencyInLayer,
+            final @NotNull boolean[] concurrencyInLayer,
             final boolean computeParallelBestPossibleAction,
             final boolean collectStatistics
     )
-            throws IOException, ClassNotFoundException {
+            throws IOException {
         if ( !pathToFile.exists() ) {
             pathToFile.mkdirs();
         }

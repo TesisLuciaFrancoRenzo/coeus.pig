@@ -77,18 +77,14 @@ class Game
 
     public
     Game(
-            @NotNull final PlayerType player1Type,
-            @NotNull final PlayerType player2Type,
+            final @NotNull PlayerType player1Type,
+            final @NotNull PlayerType player2Type,
             final PerceptronConfiguration perceptronConfiguration,
             final boolean isAIPlayer1
     ) {
         random = new Random();
         this.perceptronConfiguration = perceptronConfiguration;
-        if ( perceptronConfiguration != null ) {
-            this.encogInterface = perceptronConfiguration.getEncogInterface();
-        } else {
-            this.encogInterface = null;
-        }
+        encogInterface = perceptronConfiguration != null ? perceptronConfiguration.getEncogInterface() : null;
         currentGameState = new GameState(isAIPlayer1);
         player1Brain = setPlayerType(player1Type);
         player2Brain = setPlayerType(player2Type);
@@ -96,13 +92,13 @@ class Game
 
     public static
     void main( final String[] args )
-            throws Exception {
+            throws IllegalArgumentException, IOException, ClassNotFoundException {
         if ( args[0] == null ) {
             throw new IllegalArgumentException(USAGE);
         }
         final Game pig1;
         final Game pig2;
-        int        gamesToPlay;
+        final int  gamesToPlay;
         final int  humanPlayer;
         final PerceptronConfiguration config = new PerceptronConfiguration("PerceptronVsRandom",
                 new File("../PigPerceptrons/"),
@@ -138,7 +134,7 @@ class Game
                             throw new IllegalArgumentException("Unknown human player position. Usage: ./pig " + HUMAN_VS_RANDOM + " (1|2)");
                     }
                     pig1.play(true);
-                } catch ( NumberFormatException e ) {
+                } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown human player position. Usage: ./pig " + HUMAN_VS_RANDOM + " (1|2)");
                 }
                 break;
@@ -157,7 +153,7 @@ class Game
                     }
                     config.loadTrainedPerceptron();
                     pig1.play(true);
-                } catch ( NumberFormatException e ) {
+                } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown human player position. Usage: ./pig " + HUMAN_VS_TRAINED + " (1|2)");
                 }
                 break;
@@ -168,9 +164,9 @@ class Game
                     pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON, config, false);
                     config.newPerceptronToTrain();
                     train(config, pig1, pig2, gamesToPlay);
-                } catch ( NumberFormatException e ) {
+                } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + TRAIN_VS_RANDOM + " \"number\"");
-                } catch ( IOException e ) {
+                } catch ( final IOException e ) {
                     e.printStackTrace();
                 }
                 break;
@@ -181,7 +177,7 @@ class Game
                     pig2 = new Game(PlayerType.RANDOM, PlayerType.PERCEPTRON, config, false);
                     config.loadTrainedPerceptron();
                     simulate(pig1, pig2, gamesToPlay);
-                } catch ( NumberFormatException e ) {
+                } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAINED_VS_RANDOM + " \"number\"");
                 }
                 break;
@@ -192,9 +188,9 @@ class Game
                     pig2 = new Game(PlayerType.PERCEPTRON, PlayerType.PERCEPTRON, config, false);
                     config.newPerceptronToTrain();
                     train(config, pig1, pig2, gamesToPlay);
-                } catch ( NumberFormatException e ) {
+                } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + TRAIN_VS_ITSELF + " \"number\"");
-                } catch ( IOException e ) {
+                } catch ( final IOException e ) {
                     e.printStackTrace();
                 }
                 break;
@@ -205,7 +201,7 @@ class Game
                     pig2 = new Game(PlayerType.PERCEPTRON, PlayerType.PERCEPTRON, config, false);
                     config.loadTrainedPerceptron();
                     simulate(pig1, pig2, gamesToPlay);
-                } catch ( NumberFormatException e ) {
+                } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAINED_VS_ITSELF + " \"number\"");
                 }
                 break;
@@ -215,7 +211,7 @@ class Game
                     pig1 = new Game(PlayerType.RANDOM, PlayerType.RANDOM, null, true);
                     pig2 = new Game(PlayerType.RANDOM, PlayerType.RANDOM, null, false);
                     simulate(pig1, pig2, gamesToPlay);
-                } catch ( NumberFormatException e ) {
+                } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_RANDOM + " \"number\"");
                 }
                 break;
@@ -282,7 +278,7 @@ class Game
             if ( pig1.currentGameState.getWinner() == 2 ) {
                 winRate += 1.0d;
             }
-            if ( i % 100 == 0 ) {
+            if ( ( i % 100 ) == 0 ) {
                 final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
                 System.out.println(percent + "%");
             }
@@ -299,7 +295,7 @@ class Game
             final int gamesToPlay
     )
             throws IOException {
-        TDLambdaLearning learningAlgorithm = new TDLambdaLearning(perceptronConfiguration.getEncogInterface(),
+        final TDLambdaLearning learningAlgorithm = new TDLambdaLearning(perceptronConfiguration.getEncogInterface(),
                 perceptronConfiguration.getLearningStyle(),
                 perceptronConfiguration.getAlpha(),
                 perceptronConfiguration.getLambda(),
@@ -315,7 +311,7 @@ class Game
             learningAlgorithm.solveAndTrainOnce(pig1, i);
             pig2.reset();
             learningAlgorithm.solveAndTrainOnce(pig2, i);
-            if ( i % 100 == 0 ) {
+            if ( ( i % 100 ) == 0 ) {
                 final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
                 System.out.println(percent + "%");
             }

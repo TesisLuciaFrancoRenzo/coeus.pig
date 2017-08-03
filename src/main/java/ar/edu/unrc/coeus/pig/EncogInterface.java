@@ -102,25 +102,10 @@ class EncogInterface
         return normOutput.deNormalize(value);
     }
 
-    public
-    List< Function< Double, Double > > getActivationFunction() {
-        return activationFunction;
-    }
-
     @Override
     public
     Function< Double, Double > getActivationFunction( final int layerIndex ) {
         return activationFunction.get(layerIndex - 1);
-    }
-
-    public
-    double getActivationFunctionMax() {
-        return activationFunctionMax;
-    }
-
-    public
-    double getActivationFunctionMin() {
-        return activationFunctionMin;
     }
 
     @Override
@@ -136,11 +121,6 @@ class EncogInterface
         }
     }
 
-    public
-    List< Function< Double, Double > > getDerivedActivationFunction() {
-        return derivedActivationFunction;
-    }
-
     @Override
     public
     Function< Double, Double > getDerivedActivationFunction( final int layerIndex ) {
@@ -151,16 +131,6 @@ class EncogInterface
     public
     int getLayerQuantity() {
         return neuralNetwork.getLayerCount();
-    }
-
-    public
-    double getMaxReward() {
-        return maxReward;
-    }
-
-    public
-    double getMinReward() {
-        return minReward;
     }
 
     public
