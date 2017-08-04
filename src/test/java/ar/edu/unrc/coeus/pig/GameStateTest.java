@@ -50,6 +50,11 @@ class GameStateTest {
                 }
             }
         }
+
+        GameState state = new GameState(0, true, 0, 0, 0, 0);
+        Assert.assertTrue(state.translateToPerceptronInput(320) == 1 && state.translateToPerceptronInput(321) == 0);
+        state = new GameState(0, false, 0, 0, 0, 0);
+        Assert.assertTrue(state.translateToPerceptronInput(320) == 0 && state.translateToPerceptronInput(321) == 1);
     }
 
 }

@@ -443,9 +443,7 @@ class Game
         learningAlgorithm.setFixedLearningRate();
         learningAlgorithm.setFixedExplorationRate(0);
         for ( int i = 1; i <= gamesToPlay; i++ ) {
-            pig1.reset();
             learningAlgorithm.solveAndTrainOnce(pig1, i);
-            pig2.reset();
             learningAlgorithm.solveAndTrainOnce(pig2, i);
             if ( ( i % ( gamesToPlay / 100 ) ) == 0 ) {
                 final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
