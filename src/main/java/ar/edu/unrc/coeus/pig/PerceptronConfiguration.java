@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public
 class PerceptronConfiguration {
@@ -161,5 +162,15 @@ class PerceptronConfiguration {
     void saveTrainedNeuralNetwork()
             throws IOException {
         encogInterface.saveNeuralNetwork(trainedFile);
+    }
+
+    @Override
+    public
+    String toString() {
+        return "PerceptronConfiguration{" + "alpha=" + Arrays.toString(alpha) + ", collectStatistics=" + collectStatistics +
+               ", computeParallelBestPossibleAction=" + computeParallelBestPossibleAction + ", concurrencyInLayer=" +
+               Arrays.toString(concurrencyInLayer) + ", encogInterface=" + encogInterface + ", gamma=" + gamma + ", lambda=" + lambda +
+               ", learningStyle=" + learningStyle + ", originalFile=" + originalFile + ", replaceEligibilityTraces=" + replaceEligibilityTraces +
+               ", trainedFile=" + trainedFile + '}';
     }
 }

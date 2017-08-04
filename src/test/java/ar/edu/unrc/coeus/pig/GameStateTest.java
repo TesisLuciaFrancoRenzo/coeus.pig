@@ -12,17 +12,16 @@ class GameStateTest {
             final int player1Score,
             final int player2Score,
             final int player1TotalReward,
-            final int player2TotalReward,
-            final int player
+            final int player2TotalReward
     ) {
-        final GameState state = new GameState(0, player == 0, player1Score, player2Score, player1TotalReward, player2TotalReward);
+        final GameState state = new GameState(0, true, player1Score, player2Score, player1TotalReward, player2TotalReward);
         int             count = 0;
         for ( int i = 0; i < INPUT_NEURONS; i++ ) {
             if ( state.translateToPerceptronInput(i) == 1.0 ) {
                 count++;
             }
         }
-        if ( count != 5 ) {
+        if ( count != 4 ) {
             Assert.fail(state.toString());
         }
     }
@@ -35,26 +34,15 @@ class GameStateTest {
         final int[] scoreToTest     = { 0, 1, 2, 3, MAX_SCORE - 3, MAX_SCORE - 2, MAX_SCORE - 1, MAX_SCORE };
         final int[] maxRewordToTest = { 0, 1, 2, 3, MAX_REWARD - 3, MAX_REWARD - 2, MAX_REWARD - 1, MAX_REWARD };
 
-        for ( int player1Score = 0; player1Score < scoreToTest.length; player1Score++ ) {
-            for ( int player2Score = 0; player2Score < scoreToTest.length; player2Score++ ) {
-                for ( int player1TotalReward = 0; player1TotalReward < maxRewordToTest.length; player1TotalReward++ ) {
-                    for ( int player2TotalReward = 0; player2TotalReward < maxRewordToTest.length; player2TotalReward++ ) {
-                        for ( int player = 0; player < 2; player++ ) {
-                            inputTestFor(scoreToTest[player1Score],
-                                    scoreToTest[player2Score],
-                                    maxRewordToTest[player1TotalReward],
-                                    maxRewordToTest[player2TotalReward],
-                                    player);
-                        }
+        for ( int player1Score : scoreToTest ) {
+            for ( int player2Score : scoreToTest ) {
+                for ( int player1TotalReward : maxRewordToTest ) {
+                    for ( int player2TotalReward : maxRewordToTest ) {
+                        inputTestFor(player1Score, player2Score, player1TotalReward, player2TotalReward);
                     }
                 }
             }
         }
-
-        GameState state = new GameState(0, true, 0, 0, 0, 0);
-        Assert.assertTrue(state.translateToPerceptronInput(320) == 1 && state.translateToPerceptronInput(321) == 0);
-        state = new GameState(0, false, 0, 0, 0, 0);
-        Assert.assertTrue(state.translateToPerceptronInput(320) == 0 && state.translateToPerceptronInput(321) == 1);
     }
 
 }
