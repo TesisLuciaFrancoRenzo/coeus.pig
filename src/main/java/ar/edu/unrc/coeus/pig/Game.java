@@ -46,23 +46,23 @@ import java.util.stream.IntStream;
 public
 class Game
         implements IProblemToTrain {
-    public static final String HUMANS                     = "Humans";
-    public static final String HUMAN_VS_RANDOM            = "HumanVsRandom";
-    public static final String HUMAN_VS_TRAINED           = "HumanVsTrained";
-    public static final String SIMULATE_GREEDY            = "SimulateGreedy";
-    public static final String SIMULATE_GREEDY_VS_LAZY    = "SimulateGreedyVsLazy";
-    public static final String SIMULATE_INITIAL_VS_GREEDY = "SimulateInitialVsGreedy";
-    public static final String SIMULATE_INITIAL_VS_RANDOM = "SimulateInitialVsRandom";
-    public static final String SIMULATE_LAZY              = "SimulateLazy";
-    public static final String SIMULATE_RANDOM            = "SimulateRandom";
-    public static final String SIMULATE_RANDOM_VS_GREEDY  = "SimulateRandomVsGreedy";
-    public static final String SIMULATE_RANDOM_VS_LAZY    = "SimulateRandomVsLazy";
-    public static final String SIMULATE_TRAINED_VS_GREEDY = "SimulateTrainedVsGreedy";
-    public static final String SIMULATE_TRAINED_VS_ITSELF = "SimulateTrainedVsItself";
-    public static final String SIMULATE_TRAINED_VS_RANDOM = "SimulateTrainedVsRandom";
-    public static final String TRAIN_VS_GREEDY            = "TrainVsGreedy";
-    public static final String TRAIN_VS_ITSELF            = "TrainVsItself";
-    public static final String TRAIN_VS_RANDOM            = "TrainVsRandom";
+    public static final  String          HUMANS                       = "Humans";
+    public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
+    public static final  String          HUMAN_VS_TRAINED             = "HumanVsTrained";
+    public static final  String          SIMULATE_GREEDY              = "SimulateGreedy";
+    public static final  String          SIMULATE_GREEDY_VS_LAZY      = "SimulateGreedyVsLazy";
+    public static final  String          SIMULATE_INITIAL_VS_GREEDY   = "SimulateInitialVsGreedy";
+    public static final  String          SIMULATE_INITIAL_VS_RANDOM   = "SimulateInitialVsRandom";
+    public static final  String          SIMULATE_LAZY                = "SimulateLazy";
+    public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
+    public static final  String          SIMULATE_RANDOM_VS_GREEDY    = "SimulateRandomVsGreedy";
+    public static final  String          SIMULATE_RANDOM_VS_LAZY      = "SimulateRandomVsLazy";
+    public static final  String          SIMULATE_TRAINED_VS_GREEDY   = "SimulateTrainedVsGreedy";
+    public static final  String          SIMULATE_TRAINED_VS_ITSELF   = "SimulateTrainedVsItself";
+    public static final  String          SIMULATE_TRAINED_VS_RANDOM   = "SimulateTrainedVsRandom";
+    public static final  String          TRAIN_VS_GREEDY              = "TrainVsGreedy";
+    public static final  String          TRAIN_VS_ITSELF              = "TrainVsItself";
+    public static final  String          TRAIN_VS_RANDOM              = "TrainVsRandom";
     public static final  String          USAGE                        = "Usage: ./pig [(Humans)|(TrainRandom)|(HumanVsRandom (1|2))]";
     private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS = Arrays.asList(RollDicesAction.ROLL1DICE,
             RollDicesAction.ROLL2DICES,
@@ -74,7 +74,9 @@ class Game
             RollDicesAction.ROLL8DICES,
             RollDicesAction.ROLL9DICES,
             RollDicesAction.ROLL10DICES);
-    private static final double          MAX_REWARD                   = 1000;
+    public static        int             MAX_REWARD                   = 250;
+    public static        int             MAX_SCORE                    = 159;
+    public static        int             INPUT_NEURONS                = ( MAX_SCORE + 1 ) * 2 + 2 + ( MAX_REWARD + 1 ) * 2;
     private final EncogInterface                 encogInterface;
     private final PerceptronConfiguration        perceptronConfiguration;
     private final Function< GameState, Integer > player1Brain;
@@ -107,16 +109,17 @@ class Game
         final Game pig2;
         final int  gamesToPlay;
         final int  humanPlayer;
+
         final PerceptronConfiguration config = new PerceptronConfiguration("PigPerceptron",
                 new File("../PigPerceptrons/"),
-                new ActivationFunction[] { new ActivationTANH(), new ActivationTANH() },
-                //FIXME esta bien?
+                new ActivationFunction[] { new ActivationTANH() },
                 1,
                 -1,
-                250,
-                -250,
+                MAX_REWARD,
+                -MAX_REWARD,
                 false,
-                new int[] { 322, 1 },
+                new int[] { INPUT_NEURONS, 1 },
+                //TODO testear el limite 322, esta bien?
                 false,
                 ELearningStyle.AFTER_STATE,
                 new double[] { 0.0025, 0.0025 },

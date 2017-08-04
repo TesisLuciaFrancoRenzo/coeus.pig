@@ -22,6 +22,9 @@ package ar.edu.unrc.coeus.pig;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IStatePerceptron;
 
+import static ar.edu.unrc.coeus.pig.Game.MAX_REWARD;
+import static ar.edu.unrc.coeus.pig.Game.MAX_SCORE;
+
 /**
  *
  */
@@ -38,6 +41,9 @@ class GameState
      * neuronas 0-159
      */
     private int     player1Score;
+    /**
+     * neuronas 322 a (322+MAX_REWARD-1)
+     */
     private int     player1TotalReward;
     /**
      * neuronas 160-319
@@ -164,24 +170,36 @@ class GameState
     @Override
     public
     String toString() {
-        return "GameState{" + "dicesToRoll=" + dicesToRoll + ", isAIPlayer1=" + isAIPlayer1 + ", player1Score=" + player1Score + ", player2Score=" +
-               player2Score + '}';
+        return "GameState{" + "dicesToRoll=" + dicesToRoll + ", isAIPlayer1=" + isAIPlayer1 + ", player1Score=" + player1Score +
+               ", player1TotalReward=" + player1TotalReward + ", player2Score=" + player2Score + ", player2TotalReward=" + player2TotalReward + '}';
     }
 
     @Override
     public
     Double translateToPerceptronInput( final int neuronIndex ) {
-        if ( neuronIndex <= 159 ) {
+        int currentFirstIndex = 0;
+        if ( neuronIndex <= MAX_SCORE ) {
             return ( neuronIndex == player1Score ) ? 1d : 0d;
         }
-        if ( ( neuronIndex >= 160 ) && ( neuronIndex <= 319 ) ) {
-            return ( ( neuronIndex - 160 ) == player2Score ) ? 1d : 0d;
+        currentFirstIndex += MAX_SCORE + 1;
+        if ( neuronIndex <= currentFirstIndex + MAX_SCORE ) {
+            return ( ( neuronIndex - currentFirstIndex ) == player2Score ) ? 1d : 0d;
         }
-        if ( neuronIndex == 320 ) {
+        currentFirstIndex += MAX_SCORE + 1;
+        if ( neuronIndex == currentFirstIndex ) {
             return isAIPlayer1 ? 1d : 0d;
         }
-        if ( neuronIndex == 321 ) {
+        currentFirstIndex++;
+        if ( neuronIndex == currentFirstIndex ) {
             return isAIPlayer1 ? 0d : 1d;
+        }
+        currentFirstIndex++;
+        if ( neuronIndex <= currentFirstIndex + MAX_REWARD ) {
+            return ( ( neuronIndex - currentFirstIndex ) == player1TotalReward ) ? 1d : 0d;
+        }
+        currentFirstIndex += MAX_REWARD + 1;
+        if ( neuronIndex <= currentFirstIndex + MAX_REWARD ) {
+            return ( ( neuronIndex - currentFirstIndex ) == player2TotalReward ) ? 1d : 0d;
         }
         throw new IllegalStateException("unrecognized neuron number " + neuronIndex);
     }
