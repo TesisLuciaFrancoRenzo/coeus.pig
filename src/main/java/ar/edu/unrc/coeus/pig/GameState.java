@@ -33,43 +33,28 @@ class GameState
         implements IStatePerceptron {
 
     private int     dicesToRoll;
-    /**
-     * neuronas 320-321
-     */
-    private boolean isAIPlayer1;
-    /**
-     * neuronas 0-159
-     */
+    private boolean isPlayer1Turn;
     private int     player1Score;
-    /**
-     * neuronas 322 a (322+MAX_REWARD-1)
-     */
     private int     player1TotalReward;
-    /**
-     * neuronas 160-319
-     */
     private int     player2Score;
     private int     player2TotalReward;
 
     public
-    GameState(
-            final boolean isAIPlayer1
-    ) {
+    GameState() {
         reset();
-        this.isAIPlayer1 = isAIPlayer1;
     }
 
     public
     GameState(
             final int dicesToRoll,
-            final boolean isAIPlayer1,
+            final boolean isPlayer1Turn,
             final int player1Score,
             final int player2Score,
             final int player1TotalReward,
             final int player2TotalReward
     ) {
         this.dicesToRoll = dicesToRoll;
-        this.isAIPlayer1 = isAIPlayer1;
+        this.isPlayer1Turn = isPlayer1Turn;
         this.player1Score = player1Score;
         this.player2Score = player2Score;
         this.player1TotalReward = player1TotalReward;
@@ -79,19 +64,26 @@ class GameState
     public
     void addPlayer1Score( final int score ) {
         player1Score += score;
+    }
+
+    public
+    void addPlayer1TotalReward( final int dicesToRoll ) {
         player1TotalReward += dicesToRoll;
     }
 
     public
+    void addPlayer2TotalReward( final int dicesToRoll ) {
+        player2TotalReward += dicesToRoll;
+    }
+    public
     void addPlayer2Score( final int score ) {
         player2Score += score;
-        player2TotalReward += dicesToRoll;
     }
 
     @Override
     public
     IState getCopy() {
-        return new GameState(dicesToRoll, isAIPlayer1, player1Score, player2Score, player1TotalReward, player2TotalReward);
+        return new GameState(dicesToRoll, isPlayer1Turn, player1Score, player2Score, player1TotalReward, player2TotalReward);
     }
 
     public
@@ -143,8 +135,8 @@ class GameState
     }
 
     public
-    boolean isAIPlayer1() {
-        return isAIPlayer1;
+    boolean isPlayer1Turn() {
+        return isPlayer1Turn;
     }
 
     @Override
@@ -155,6 +147,7 @@ class GameState
 
     public
     void reset() {
+        isPlayer1Turn = true;
         dicesToRoll = 0;
         player1Score = 0;
         player2Score = 0;
@@ -164,13 +157,13 @@ class GameState
 
     public
     void swapPlayers() {
-        isAIPlayer1 = !isAIPlayer1;
+        isPlayer1Turn = !isPlayer1Turn;
     }
 
     @Override
     public
     String toString() {
-        return "GameState{" + "dicesToRoll=" + dicesToRoll + ", isAIPlayer1=" + isAIPlayer1 + ", player1Score=" + player1Score +
+        return "GameState{" + "dicesToRoll=" + dicesToRoll + ", isPlayer1Turn=" + isPlayer1Turn + ", player1Score=" + player1Score +
                ", player1TotalReward=" + player1TotalReward + ", player2Score=" + player2Score + ", player2TotalReward=" + player2TotalReward + '}';
     }
 
@@ -187,11 +180,11 @@ class GameState
         }
         currentFirstIndex += MAX_SCORE + 1;
         if ( neuronIndex == currentFirstIndex ) {
-            return isAIPlayer1 ? 1d : 0d;
+            return isPlayer1Turn ? 1d : 0d;
         }
         currentFirstIndex++;
         if ( neuronIndex == currentFirstIndex ) {
-            return isAIPlayer1 ? 0d : 1d;
+            return isPlayer1Turn ? 0d : 1d;
         }
         currentFirstIndex++;
         if ( neuronIndex <= currentFirstIndex + MAX_REWARD ) {
