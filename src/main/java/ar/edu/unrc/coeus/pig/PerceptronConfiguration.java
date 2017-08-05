@@ -155,7 +155,7 @@ class PerceptronConfiguration {
         if ( trainedFile.exists() ) {
             trainedFile.delete();
         }
-        encogInterface.createPerceptron(originalFile, false);
+        encogInterface.createPerceptron(originalFile, true);
     }
 
     public

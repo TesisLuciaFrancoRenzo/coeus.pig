@@ -46,16 +46,20 @@ import java.util.stream.IntStream;
 public
 class Game
         implements IProblemToTrain {
-    public static final  String          HUMANS                       = "Humans";
-    public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
-    public static final  int             MAX_REWARD                   = 250;
+    public static final String HUMANS          = "Humans";
+    public static final String HUMAN_VS_RANDOM = "HumanVsRandom";
+
+    public static final  int             MAX_DICES_TO_ROLL            = 10;
     public static final  int             MAX_SCORE                    = 159;
-    public static final  int             INPUT_NEURONS                = ( ( MAX_SCORE + 1 ) * 2 ) + ( ( MAX_REWARD + 1 ) * 2 );
+    public static final  int             MAX_TOTAL_REWARD             = 250;
+    public static final  int             INPUT_NEURONS                =
+            ( ( MAX_SCORE + 1 ) * 2 ) + ( ( MAX_TOTAL_REWARD + 1 ) * 2 ) + MAX_DICES_TO_ROLL + 1;
     public static final  String          SIMULATE_GREEDY              = "SimulateGreedy";
     public static final  String          SIMULATE_GREEDY_VS_INITIAL   = "SimulateGreedyVsInitial";
     public static final  String          SIMULATE_GREEDY_VS_LAZY      = "SimulateGreedyVsLazy";
     public static final  String          SIMULATE_GREEDY_VS_RANDOM    = "SimulateGreedyVsRandom";
     public static final  String          SIMULATE_GREEDY_VS_TRAINED   = "SimulateGreedyVsTrained";
+    public static final  String          SIMULATE_RANDOM_VS_GREEDY    = "SimulateRandomVsGreedy";
     public static final  String          SIMULATE_LAZY                = "SimulateLazy";
     public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
     public static final  String          SIMULATE_RANDOM_VS_INITIAL   = "SimulateRandomVsInitial";
@@ -110,15 +114,12 @@ class Game
                 new File("../PigPerceptrons/"),
                 new ActivationFunction[] { new ActivationTANH() },
                 1.0,
-                -1.0,
-                (double) MAX_REWARD,
-                (double) -MAX_REWARD,
+                -1.0, (double) MAX_TOTAL_REWARD, (double) -MAX_TOTAL_REWARD,
                 false,
                 new int[] { INPUT_NEURONS, 1 },
                 false,
                 ELearningStyle.AFTER_STATE,
-                new double[] { 0.0025, 0.0025 },
-                (double) 0,
+                new double[] { 0.0025, 0.0025 }, 0.3d,
                 false,
                 1.0,
                 new boolean[] { false, false },
@@ -218,6 +219,15 @@ class Game
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_GREEDY_VS_RANDOM + " \"number\"");
                 }
                 break;
+            case SIMULATE_RANDOM_VS_GREEDY:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig = new Game(PlayerType.RANDOM, PlayerType.GREEDY, null);
+                    simulate(pig, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_RANDOM_VS_GREEDY + " \"number\"");
+                }
+                break;
             case SIMULATE_RANDOM_VS_LAZY:
                 try {
                     gamesToPlay = Integer.parseInt(args[1]);
@@ -296,6 +306,9 @@ class Game
     ) {
         if ( show ) {
             System.out.printf("Tiradas = ");
+        }
+        if ( dicesToRoll <= 0 ) {
+            throw new IllegalArgumentException("dicesToRoll tiene que ser un valor mayor o igual a 1");
         }
         int total = 0;
         for ( int i = 0; i < dicesToRoll; i++ ) {
@@ -426,9 +439,10 @@ class Game
     ) {
         //copiamos el estado inicial para calcular el after state.
         final GameState newGameState = (GameState) turnInitialState.getCopy();
+        assert !newGameState.isPlayer1Turn();
+
         //nuestro partial score es la cantidad de dados arrojados en el turno.
         newGameState.setDicesToRoll(( (RollDicesAction) action ).getNumVal());
-        assert !newGameState.isPlayer1Turn();
         newGameState.addPlayer2TotalReward(newGameState.getDicesToRoll());
         return newGameState;
     }
@@ -448,7 +462,9 @@ class Game
             finalGameState.setDicesToRoll(player1Brain.apply(finalGameState));
             finalGameState.addPlayer1TotalReward(finalGameState.getDicesToRoll());
             finalGameState.addPlayer1Score(rollDices(finalGameState.getDicesToRoll(), random, false));
-            finalGameState.swapPlayers();
+            if ( !finalGameState.isTerminalState() ) {
+                finalGameState.swapPlayers(); //TODO va final State?
+            }
         }
         return finalGameState;
     }
@@ -491,6 +507,7 @@ class Game
     public
     IState initialize() {
         currentGameState.reset();
+        assert currentGameState.isPlayer1Turn();
         currentGameState.setDicesToRoll(player1Brain.apply(currentGameState));
         currentGameState.addPlayer1TotalReward(currentGameState.getDicesToRoll());
         currentGameState.addPlayer1Score(rollDices(currentGameState.getDicesToRoll(), random, false));
@@ -507,8 +524,8 @@ class Game
     @Override
     public
     double normalizeValueToPerceptronOutput( final Object value ) {
-        if ( (Double) value > (double) MAX_REWARD ) {
-            throw new IllegalArgumentException("value no puede ser mayor a MAX_REWARD=" + MAX_REWARD);
+        if ( (Double) value > (double) MAX_TOTAL_REWARD ) {
+            throw new IllegalArgumentException("value no puede ser mayor a MAX_TOTAL_REWARD=" + MAX_TOTAL_REWARD);
         }
         return encogInterface.normalizeOutput((Double) value);
     }

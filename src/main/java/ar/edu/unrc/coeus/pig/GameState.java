@@ -22,8 +22,7 @@ package ar.edu.unrc.coeus.pig;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IStatePerceptron;
 
-import static ar.edu.unrc.coeus.pig.Game.MAX_REWARD;
-import static ar.edu.unrc.coeus.pig.Game.MAX_SCORE;
+import static ar.edu.unrc.coeus.pig.Game.*;
 
 /**
  *
@@ -32,9 +31,15 @@ public final
 class GameState
         implements IStatePerceptron {
 
+    /**
+     * Usad para saber cuantos dados hay que tirar. También dados Es usado como recompensa parcial.
+     */
     private int     dicesToRoll;
     private boolean isPlayer1Turn;
     private int     player1Score;
+    /**
+     * Cantidad de dados tirados en una partida. Sumatoria de recompensas parciales.
+     */
     private int     player1TotalReward;
     private int     player2Score;
     private int     player2TotalReward;
@@ -159,6 +164,7 @@ class GameState
     public
     void swapPlayers() {
         isPlayer1Turn = !isPlayer1Turn;
+        dicesToRoll = 0;
     }
 
     @Override
@@ -179,12 +185,17 @@ class GameState
             return ( ( neuronIndex - currentFirstIndex ) == player2Score ) ? 1d : 0d;
         }
         currentFirstIndex += MAX_SCORE + 1;
-        if ( neuronIndex <= ( currentFirstIndex + MAX_REWARD ) ) {
+        if ( neuronIndex <= ( currentFirstIndex + MAX_TOTAL_REWARD ) ) {
             return ( ( neuronIndex - currentFirstIndex ) == player1TotalReward ) ? 1d : 0d;
         }
-        currentFirstIndex += MAX_REWARD + 1;
-        if ( neuronIndex <= ( currentFirstIndex + MAX_REWARD ) ) {
+        currentFirstIndex += MAX_TOTAL_REWARD + 1;
+        if ( neuronIndex <= ( currentFirstIndex + MAX_TOTAL_REWARD ) ) {
             return ( ( neuronIndex - currentFirstIndex ) == player2TotalReward ) ? 1d : 0d;
+        }
+        currentFirstIndex += MAX_TOTAL_REWARD + 1;
+        if ( neuronIndex <= ( currentFirstIndex + MAX_DICES_TO_ROLL ) ) {
+            assert dicesToRoll > 0;
+            return ( ( neuronIndex - currentFirstIndex ) == dicesToRoll ) ? 1d : 0d;
         }
         throw new IllegalStateException("unrecognized neuron number " + neuronIndex);
     }
