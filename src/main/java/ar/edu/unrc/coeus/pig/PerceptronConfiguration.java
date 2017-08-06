@@ -27,6 +27,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static ar.edu.unrc.coeus.pig.Game.FIRST_DICES_TO_ROLL_INDEX;
+import static ar.edu.unrc.coeus.pig.Game.LAZY_PERCEPTRON_WEIGHT;
+
 public
 class PerceptronConfiguration {
     private final double[]       alpha;
@@ -36,8 +39,8 @@ class PerceptronConfiguration {
     private final EncogInterface encogInterface;
     private final double         gamma;
     private final double         lambda;
+    private final File           lazyFile;
     private final ELearningStyle learningStyle;
-    private final File           originalFile;
     private final boolean        replaceEligibilityTraces;
     private final File           trainedFile;
 
@@ -77,8 +80,8 @@ class PerceptronConfiguration {
                 hasBias,
                 neuronQuantityInLayer,
                 concurrentInput);
-        originalFile = new File(pathToFile.getCanonicalPath() + File.separator + experimentName + "_Original.ser");
         trainedFile = new File(pathToFile.getCanonicalPath() + File.separator + experimentName + "_Trained.ser");
+        lazyFile = new File(pathToFile.getCanonicalPath() + File.separator + experimentName + "_Lazy.ser");
         this.computeParallelBestPossibleAction = computeParallelBestPossibleAction;
         this.learningStyle = learningStyle;
         this.alpha = alpha;
@@ -120,6 +123,20 @@ class PerceptronConfiguration {
     }
 
     public
+    void initPerceptronToTrain()
+            throws IOException, ClassNotFoundException {
+        if ( lazyFile.exists() ) {
+            lazyFile.delete();
+        }
+        if ( trainedFile.exists() ) {
+            trainedFile.delete();
+        }
+        encogInterface.createPerceptron(lazyFile, false);
+        encogInterface.setWeight(1, 0, FIRST_DICES_TO_ROLL_INDEX, LAZY_PERCEPTRON_WEIGHT);
+        encogInterface.saveNeuralNetwork(lazyFile);
+    }
+
+    public
     boolean isCollectStatistics() {
         return collectStatistics;
     }
@@ -135,9 +152,9 @@ class PerceptronConfiguration {
     }
 
     public
-    void loadInitialPerceptron()
+    void loadLazyPerceptron()
             throws IOException, ClassNotFoundException {
-        encogInterface.loadPerceptron(originalFile);
+        encogInterface.loadPerceptron(lazyFile);
     }
 
     public
@@ -147,15 +164,9 @@ class PerceptronConfiguration {
     }
 
     public
-    void newPerceptronToTrain()
-            throws IOException, ClassNotFoundException {
-        if ( originalFile.exists() ) {
-            originalFile.delete();
-        }
-        if ( trainedFile.exists() ) {
-            trainedFile.delete();
-        }
-        encogInterface.createPerceptron(originalFile, true);
+    void saveLazyNeuralNetwork()
+            throws IOException {
+        encogInterface.saveNeuralNetwork(lazyFile);
     }
 
     public
@@ -170,7 +181,7 @@ class PerceptronConfiguration {
         return "PerceptronConfiguration{" + "alpha=" + Arrays.toString(alpha) + ", collectStatistics=" + collectStatistics +
                ", computeParallelBestPossibleAction=" + computeParallelBestPossibleAction + ", concurrencyInLayer=" +
                Arrays.toString(concurrencyInLayer) + ", encogInterface=" + encogInterface + ", gamma=" + gamma + ", lambda=" + lambda +
-               ", learningStyle=" + learningStyle + ", originalFile=" + originalFile + ", replaceEligibilityTraces=" + replaceEligibilityTraces +
+               ", lazyFile=" + lazyFile + ", learningStyle=" + learningStyle + ", replaceEligibilityTraces=" + replaceEligibilityTraces +
                ", trainedFile=" + trainedFile + '}';
     }
 }

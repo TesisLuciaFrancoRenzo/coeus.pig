@@ -177,25 +177,21 @@ class GameState
     @Override
     public
     Double translateToPerceptronInput( final int neuronIndex ) {
-        if ( neuronIndex <= MAX_SCORE ) {
+        if ( neuronIndex <= FIRST_PLAYER_1_SCORE_INDEX + MAX_SCORE ) {
             return ( neuronIndex == player1Score ) ? 1d : 0d;
         }
-        int currentFirstIndex = MAX_SCORE + 1;
-        if ( neuronIndex <= ( currentFirstIndex + MAX_SCORE ) ) {
-            return ( ( neuronIndex - currentFirstIndex ) == player2Score ) ? 1d : 0d;
+        if ( neuronIndex <= ( FIRST_PLAYER_2_SCORE_INDEX + MAX_SCORE ) ) {
+            return ( ( neuronIndex - FIRST_PLAYER_2_SCORE_INDEX ) == player2Score ) ? 1d : 0d;
         }
-        currentFirstIndex += MAX_SCORE + 1;
-        if ( neuronIndex <= ( currentFirstIndex + MAX_TOTAL_REWARD ) ) {
-            return ( ( neuronIndex - currentFirstIndex ) == player1TotalReward ) ? 1d : 0d;
+        if ( neuronIndex <= ( FIRST_PLAYER_1_TOTAL_REWARD_INDEX + MAX_TOTAL_REWARD ) ) {
+            return ( ( neuronIndex - FIRST_PLAYER_1_TOTAL_REWARD_INDEX ) == player1TotalReward ) ? 1d : 0d;
         }
-        currentFirstIndex += MAX_TOTAL_REWARD + 1;
-        if ( neuronIndex <= ( currentFirstIndex + MAX_TOTAL_REWARD ) ) {
-            return ( ( neuronIndex - currentFirstIndex ) == player2TotalReward ) ? 1d : 0d;
+        if ( neuronIndex <= ( FIRST_PLAYER_2_TOTAL_REWARD_INDEX + MAX_TOTAL_REWARD ) ) {
+            return ( ( neuronIndex - FIRST_PLAYER_2_TOTAL_REWARD_INDEX ) == player2TotalReward ) ? 1d : 0d;
         }
-        currentFirstIndex += MAX_TOTAL_REWARD + 1;
-        if ( neuronIndex <= ( currentFirstIndex + MAX_DICES_TO_ROLL ) ) {
+        if ( neuronIndex <= ( FIRST_DICES_TO_ROLL_INDEX + MAX_DICES_TO_ROLL - 1 ) ) {
             assert dicesToRoll > 0;
-            return ( ( neuronIndex - currentFirstIndex ) == dicesToRoll ) ? 1d : 0d;
+            return ( ( neuronIndex - FIRST_DICES_TO_ROLL_INDEX ) == dicesToRoll - 1 ) ? 1d : 0d;
         }
         throw new IllegalStateException("unrecognized neuron number " + neuronIndex);
     }

@@ -32,11 +32,20 @@ class GameStateTest {
 
     @Test
     public final
+    void lazyPerceptron() {
+        final GameState state = new GameState(1, true, 0, 0, 0, 0);
+        Assert.assertTrue(state.translateToPerceptronInput(FIRST_DICES_TO_ROLL_INDEX) == 1.0d);
+        Assert.assertTrue(state.translateToPerceptronInput(FIRST_DICES_TO_ROLL_INDEX - 1) == 0.0d);
+        Assert.assertTrue(state.translateToPerceptronInput(FIRST_DICES_TO_ROLL_INDEX + 1) == 0.0d);
+    }
+
+    @Test
+    public final
     void translateToPerceptronInput()
             throws Exception {
 
         final int[] scoreToTest     = { 0, 1, 2, 3, MAX_SCORE - 3, MAX_SCORE - 2, MAX_SCORE - 1, MAX_SCORE };
-        final int[] diceToTest      = { 1, 2, 3, MAX_DICES_TO_ROLL - 3, MAX_DICES_TO_ROLL - 2, MAX_DICES_TO_ROLL - 1, MAX_DICES_TO_ROLL };
+        final int[] diceToTest      = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
         final int[] maxRewordToTest = { 0, 1, 2, 3, MAX_TOTAL_REWARD - 3, MAX_TOTAL_REWARD - 2, MAX_TOTAL_REWARD - 1, MAX_TOTAL_REWARD };
 
         for ( int player1Score : scoreToTest ) {
@@ -51,5 +60,6 @@ class GameStateTest {
             }
         }
     }
+
 
 }
