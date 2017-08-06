@@ -121,8 +121,7 @@ class Game
                 new File("../PigPerceptrons/"),
                 new ActivationFunction[] { new ActivationTANH() }, 1.0, -1.0, MAX_TOTAL_REWARD, -MAX_TOTAL_REWARD,
                 false,
-                new int[] { INPUT_NEURONS, 1 },
-                false, ELearningStyle.AFTER_STATE, new double[] { 0.002, 0.002 }, 0.7d,
+                new int[] { INPUT_NEURONS, 1 }, false, ELearningStyle.AFTER_STATE, new double[] { 0.0025, 0.0025 }, 0.3d,
                 false,
                 1.0,
                 new boolean[] { false, false },
@@ -409,8 +408,8 @@ class Game
                 perceptronConfiguration.getConcurrencyInLayer(),
                 new Random(),
                 perceptronConfiguration.isCollectStatistics());
-        learningAlgorithm.setFixedLearningRate();
-        learningAlgorithm.setFixedExplorationRate(0.1);
+        learningAlgorithm.setAnnealingLearningRate(25_000);
+        learningAlgorithm.setLinearExplorationRate(0.1, 5_000, 0, 10_000);
         for ( int i = 1; i <= gamesToPlay; i++ ) {
             learningAlgorithm.solveAndTrainOnce(pig, i);
             if ( ( i % ( gamesToPlay / 100 ) ) == 0 ) {
@@ -497,11 +496,6 @@ class Game
             final Object[] output
     ) {
         return (Double) output[0];
-    }
-
-    public
-    void createLazyPerceptron() {
-
     }
 
     @Override
