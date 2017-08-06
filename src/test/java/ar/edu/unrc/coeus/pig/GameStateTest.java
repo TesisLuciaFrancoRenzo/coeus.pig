@@ -9,7 +9,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public
 class GameStateTest {
 
-    public static final int NEURONS_TO_ACTIVATE = 5;
+    public static final int NEURONS_TO_ACTIVATE = 1;
 
     private static
     void inputTestFor(

@@ -22,7 +22,8 @@ package ar.edu.unrc.coeus.pig;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IState;
 import ar.edu.unrc.coeus.tdlearning.interfaces.IStatePerceptron;
 
-import static ar.edu.unrc.coeus.pig.Game.*;
+import static ar.edu.unrc.coeus.pig.Game.FIRST_DICES_TO_ROLL_INDEX;
+import static ar.edu.unrc.coeus.pig.Game.MAX_DICES_TO_ROLL;
 
 /**
  *
@@ -37,9 +38,6 @@ class GameState
     private int     dicesToRoll;
     private boolean isPlayer1Turn;
     private int     player1Score;
-    /**
-     * Cantidad de dados tirados en una partida. Sumatoria de recompensas parciales.
-     */
     private int     player1TotalReward;
     private int     player2Score;
     private int     player2TotalReward;
@@ -177,18 +175,6 @@ class GameState
     @Override
     public
     Double translateToPerceptronInput( final int neuronIndex ) {
-        if ( neuronIndex <= ( FIRST_PLAYER_1_SCORE_INDEX + MAX_SCORE ) ) {
-            return ( neuronIndex == player1Score ) ? 1.0d : 0.0d;
-        }
-        if ( neuronIndex <= ( FIRST_PLAYER_2_SCORE_INDEX + MAX_SCORE ) ) {
-            return ( ( neuronIndex - FIRST_PLAYER_2_SCORE_INDEX ) == player2Score ) ? 1.0d : 0.0d;
-        }
-        if ( neuronIndex <= ( FIRST_PLAYER_1_TOTAL_REWARD_INDEX + MAX_TOTAL_REWARD ) ) {
-            return ( ( neuronIndex - FIRST_PLAYER_1_TOTAL_REWARD_INDEX ) == player1TotalReward ) ? 1.0d : 0.0d;
-        }
-        if ( neuronIndex <= ( FIRST_PLAYER_2_TOTAL_REWARD_INDEX + MAX_TOTAL_REWARD ) ) {
-            return ( ( neuronIndex - FIRST_PLAYER_2_TOTAL_REWARD_INDEX ) == player2TotalReward ) ? 1.0d : 0.0d;
-        }
         if ( neuronIndex <= ( ( FIRST_DICES_TO_ROLL_INDEX + MAX_DICES_TO_ROLL ) - 1 ) ) {
             assert dicesToRoll > 0;
             return ( ( neuronIndex - FIRST_DICES_TO_ROLL_INDEX ) == ( dicesToRoll - 1 ) ) ? 1.0d : 0.0d;
