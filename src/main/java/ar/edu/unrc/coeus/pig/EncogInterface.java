@@ -102,7 +102,7 @@ class EncogInterface
             final File perceptronFile,
             final boolean randomized
     )
-            throws IOException, ClassNotFoundException {
+            throws IOException {
         //Si el archivo no existe, creamos un perceptron nuevo inicializado al azar
         neuralNetwork = initializeEncogPerceptron(randomized);
         SerializeObject.save(perceptronFile, neuralNetwork);

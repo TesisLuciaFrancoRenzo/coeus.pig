@@ -119,12 +119,10 @@ class Game
 
         final PerceptronConfiguration config = new PerceptronConfiguration("PigPerceptron",
                 new File("../PigPerceptrons/"),
-                new ActivationFunction[] { new ActivationTANH() },
-                1.0, -1.0, (double) MAX_TOTAL_REWARD, (double) -MAX_TOTAL_REWARD,
+                new ActivationFunction[] { new ActivationTANH() }, 1.0, -1.0, MAX_TOTAL_REWARD, -MAX_TOTAL_REWARD,
                 false,
                 new int[] { INPUT_NEURONS, 1 },
-                false,
-                ELearningStyle.AFTER_STATE, new double[] { 0.005, 0.005 }, 0.7d,
+                false, ELearningStyle.AFTER_STATE, new double[] { 0.002, 0.002 }, 0.7d,
                 false,
                 1.0,
                 new boolean[] { false, false },
@@ -379,11 +377,11 @@ class Game
                 maxFinalReward = pig.currentGameState.getPlayer2TotalReward();
             }
             if ( ( i % ( gamesToPlay / 100 ) ) == 0 ) {
-                final int percent = (int) ( ( ( (double) i * 1.0d ) / ( (double) gamesToPlay * 1.0d ) ) * 100.0d );
+                final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
                 System.out.println(new Date() + " - " + percent + " %");
             }
         }
-        final double winRate = ( (double) wins * 100d ) / (double) ( gamesToPlay );
+        final double winRate = ( wins * 100.0d ) / ( gamesToPlay );
         System.out.println(new Date() + " => WinRate = " + winRate + " (" + wins + '/' + ( gamesToPlay ) + ") - maxFinalReward=" + maxFinalReward);
     }
 
@@ -416,7 +414,7 @@ class Game
         for ( int i = 1; i <= gamesToPlay; i++ ) {
             learningAlgorithm.solveAndTrainOnce(pig, i);
             if ( ( i % ( gamesToPlay / 100 ) ) == 0 ) {
-                final int percent = (int) ( ( ( (double) i * 1.0d ) / ( (double) gamesToPlay * 1.0d ) ) * 100.0d );
+                final int percent = (int) ( ( ( i * 1.0d ) / ( gamesToPlay * 1.0d ) ) * 100.0d );
                 System.out.println(new Date() + " - " + percent + " %");
             }
         }
