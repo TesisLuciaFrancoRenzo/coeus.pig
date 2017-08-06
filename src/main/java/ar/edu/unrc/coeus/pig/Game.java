@@ -46,32 +46,37 @@ import java.util.stream.IntStream;
 public
 class Game
         implements IProblemToTrain {
-    public static final  String          CREATE_LAZY_PERCEPTRON       = "CreateLazyPerceptron";
-    public static final  int             FIRST_DICES_TO_ROLL_INDEX    = 0;
-    public static final  String          HUMANS                       = "Humans";
-    public static final  String          HUMAN_VS_RANDOM              = "HumanVsRandom";
-    public static final  double          LAZY_PERCEPTRON_WEIGHT       = 0.1d;
-    public static final  int             MAX_DICES_TO_ROLL            = 10;
-    public static final  int             INPUT_NEURONS                = MAX_DICES_TO_ROLL;
-    public static final  int             MAX_SCORE                    = 159;
-    public static final  int             MAX_TOTAL_REWARD             = 250;
-    public static final  String          SIMULATE_GREEDY              = "SimulateGreedy";
-    public static final  String          SIMULATE_GREEDY_VS_INITIAL   = "SimulateGreedyVsInitial";
-    public static final  String          SIMULATE_GREEDY_VS_LAZY      = "SimulateGreedyVsLazy";
-    public static final  String          SIMULATE_GREEDY_VS_RANDOM    = "SimulateGreedyVsRandom";
-    public static final  String          SIMULATE_GREEDY_VS_TRAINED   = "SimulateGreedyVsTrained";
-    public static final  String          SIMULATE_LAZY                = "SimulateLazy";
-    public static final  String          SIMULATE_LAZY_VS_INITIAL     = "SimulateLazyVsInitial";
-    public static final  String          SIMULATE_RANDOM              = "SimulateRandom";
-    public static final  String          SIMULATE_RANDOM_VS_GREEDY    = "SimulateRandomVsGreedy";
-    public static final  String          SIMULATE_RANDOM_VS_INITIAL   = "SimulateRandomVsInitial";
-    public static final  String          SIMULATE_RANDOM_VS_LAZY      = "SimulateRandomVsLazy";
-    public static final  String          SIMULATE_RANDOM_VS_TRAINED   = "SimulateRandomVsTrained";
-    public static final  String          TRAINED_VS_HUMAN             = "TrainedVsHuman";
-    public static final  String          TRAIN_VS_GREEDY              = "TrainVsGreedy";
-    public static final  String          TRAIN_VS_RANDOM              = "TrainVsRandom";
-    public static final  String          USAGE                        = "Usage: ./pig [(Humans)|(TrainRandom)|(HumanVsRandom (1|2))]";
-    private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS = Arrays.asList(RollDicesAction.ROLL1DICE,
+    public static final  String          CREATE_LAZY_PERCEPTRON         = "CreateLazyPerceptron";
+    public static final  int             FIRST_DICES_TO_ROLL_INDEX      = 0;
+    public static final  String          HUMANS                         = "Humans";
+    public static final  String          HUMAN_VS_RANDOM                = "HumanVsRandom";
+    public static final  double          LAZY_PERCEPTRON_INITIAL_WEIGHT = 0.1d;
+    public static final  int             MAX_DICES_TO_ROLL              = 10;
+    public static final  int             INPUT_NEURONS                  = MAX_DICES_TO_ROLL;
+    public static final  int             MAX_SCORE                      = 159;
+    public static final  int             MAX_TOTAL_REWARD               = 250;
+    public static final  String          SIMULATE_GREEDY                = "SimulateGreedy";
+    public static final  String          SIMULATE_GREEDY_VS_INITIAL     = "SimulateGreedyVsInitial";
+    public static final  String          SIMULATE_GREEDY_VS_LAZY        = "SimulateGreedyVsLazy";
+    public static final  String          SIMULATE_GREEDY_VS_RANDOM      = "SimulateGreedyVsRandom";
+    public static final  String          SIMULATE_GREEDY_VS_TRAINED     = "SimulateGreedyVsTrained";
+    public static final  String          SIMULATE_LAZY                  = "SimulateLazy";
+    public static final  String          SIMULATE_LAZY_VS_INITIAL       = "SimulateLazyVsInitial";
+    public static final  String          SIMULATE_RANDOM                = "SimulateRandom";
+    public static final  String          SIMULATE_RANDOM_VS_GREEDY      = "SimulateRandomVsGreedy";
+    public static final  String          SIMULATE_RANDOM_VS_INITIAL     = "SimulateRandomVsInitial";
+    public static final  String          SIMULATE_RANDOM_VS_LAZY        = "SimulateRandomVsLazy";
+    public static final  String          SIMULATE_RANDOM_VS_TRAINED     = "SimulateRandomVsTrained";
+    public static final  String          TRAINED_VS_HUMAN               = "TrainedVsHuman";
+    public static final  String          TRAIN_VS_GREEDY                = "TrainVsGreedy";
+    public static final  String          TRAIN_VS_RANDOM                = "TrainVsRandom";
+    public static final  String          USAGE                          =
+            "Usage: ./pig [(Humans)|(HumanVsRandom (1|2))|(TrainedVsHuman \"number\")|(TrainRandom \"number\")|(TrainVsGreedy \"number\")|" +
+            "(SimulateGreedy \"number\")|(SimulateGreedyVsInitial \"number\")|(SimulateGreedyVsLazy \"number\")|(SimulateGreedyVsRandom \"number\")" +
+            "|(SimulateGreedyVsTrained \"number\")|(SimulateLazy \"number\")|(SimulateLazyVsInitial \"number\")|(SimulateRandom \"number\")|" +
+            "(SimulateRandomVsGreedy \"number\")|(SimulateRandomVsInitial \"number\")|(SimulateRandomVsLazy \"number\")|(SimulateRandomVsTrained " +
+            "\"number\")]";
+    private static final List< IAction > LIST_OF_ALL_POSSIBLE_ACTIONS   = Arrays.asList(RollDicesAction.ROLL1DICE,
             RollDicesAction.ROLL2DICES,
             RollDicesAction.ROLL3DICES,
             RollDicesAction.ROLL4DICES,
@@ -113,9 +118,19 @@ class Game
         final int  gamesToPlay;
 
         final PerceptronConfiguration config = new PerceptronConfiguration("PigPerceptron",
-                new File("../PigPerceptrons/"), new ActivationFunction[] { new ActivationTANH() }, 1.0, -1.0, MAX_TOTAL_REWARD, -MAX_TOTAL_REWARD,
-                false, new int[] { INPUT_NEURONS, 1 },
-                false, ELearningStyle.AFTER_STATE, new double[] { 0.0025, 0.0025 }, 0.3d, true,
+                new File("../PigPerceptrons/"),
+                new ActivationFunction[] { new ActivationTANH() },
+                1.0,
+                -1.0,
+                MAX_TOTAL_REWARD,
+                -MAX_TOTAL_REWARD,
+                false,
+                new int[] { INPUT_NEURONS, 1 },
+                false,
+                ELearningStyle.AFTER_STATE,
+                new double[] { 0.0025, 0.0025 },
+                0.3d,
+                true,
                 1.0,
                 new boolean[] { false, false },
                 false,
@@ -177,7 +192,7 @@ class Game
             case CREATE_LAZY_PERCEPTRON:
                 try {
                     config.initPerceptronToTrain();
-                    config.getEncogInterface().setWeight(1, 0, FIRST_DICES_TO_ROLL_INDEX, LAZY_PERCEPTRON_WEIGHT);
+                    config.getEncogInterface().setWeight(1, 0, FIRST_DICES_TO_ROLL_INDEX, LAZY_PERCEPTRON_INITIAL_WEIGHT);
                     config.saveLazyNeuralNetwork();
                 } catch ( final Exception e ) {
                     e.printStackTrace();

@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static ar.edu.unrc.coeus.pig.Game.FIRST_DICES_TO_ROLL_INDEX;
-import static ar.edu.unrc.coeus.pig.Game.LAZY_PERCEPTRON_WEIGHT;
+import static ar.edu.unrc.coeus.pig.Game.LAZY_PERCEPTRON_INITIAL_WEIGHT;
 
 public
 class PerceptronConfiguration {
@@ -132,7 +132,7 @@ class PerceptronConfiguration {
             trainedFile.delete();
         }
         encogInterface.createPerceptron(lazyFile, false);
-        encogInterface.setWeight(1, 0, FIRST_DICES_TO_ROLL_INDEX, LAZY_PERCEPTRON_WEIGHT);
+        encogInterface.setWeight(1, 0, FIRST_DICES_TO_ROLL_INDEX, LAZY_PERCEPTRON_INITIAL_WEIGHT);
         encogInterface.saveNeuralNetwork(lazyFile);
     }
 
