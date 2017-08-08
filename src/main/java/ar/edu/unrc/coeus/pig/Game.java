@@ -55,13 +55,14 @@ class Game
     public static final  int             INPUT_NEURONS                  = MAX_DICES_TO_ROLL;
     public static final  int             MAX_SCORE                      = 159;
     public static final  int             MAX_TOTAL_REWARD               = 250;
-    public static final  String          SIMULATE_GREEDY                = "SimulateGreedy";
-    public static final  String          SIMULATE_GREEDY_VS_INITIAL     = "SimulateGreedyVsInitial";
-    public static final  String          SIMULATE_GREEDY_VS_LAZY        = "SimulateGreedyVsLazy";
-    public static final  String          SIMULATE_GREEDY_VS_RANDOM      = "SimulateGreedyVsRandom";
-    public static final  String          SIMULATE_GREEDY_VS_TRAINED     = "SimulateGreedyVsTrained";
-    public static final  String          SIMULATE_LAZY                  = "SimulateLazy";
+    public static final String SIMULATE_GREEDY            = "SimulateGreedy";
+    public static final String SIMULATE_GREEDY_VS_INITIAL = "SimulateGreedyVsInitial";
+    public static final String SIMULATE_GREEDY_VS_LAZY    = "SimulateGreedyVsLazy";
+    public static final String SIMULATE_GREEDY_VS_RANDOM  = "SimulateGreedyVsRandom";
+    public static final String SIMULATE_GREEDY_VS_TRAINED = "SimulateGreedyVsTrained";
+    public static final String SIMULATE_LAZY              = "SimulateLazy";
     public static final String SIMULATE_LAZY_VS_INITIAL   = "SimulateLazyVsInitial";
+    public static final String SIMULATE_LAZY_VS_TRAINED   = "SimulateLazyVsTrained";
     public static final String SIMULATE_RANDOM            = "SimulateRandom";
     public static final String SIMULATE_RANDOM_VS_GREEDY  = "SimulateRandomVsGreedy";
     public static final String SIMULATE_RANDOM_VS_INITIAL = "SimulateRandomVsInitial";
@@ -242,6 +243,16 @@ class Game
                     simulate(pig, gamesToPlay);
                 } catch ( final NumberFormatException ignored ) {
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_GREEDY_VS_TRAINED + " \"number\"");
+                }
+                break;
+            case SIMULATE_LAZY_VS_TRAINED:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig = new Game(PlayerType.LAZY, PlayerType.PERCEPTRON, config);
+                    config.loadTrainedPerceptron();
+                    simulate(pig, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_LAZY_VS_TRAINED + " \"number\"");
                 }
                 break;
             case SIMULATE_RANDOM:
