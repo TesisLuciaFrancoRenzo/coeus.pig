@@ -61,16 +61,18 @@ class Game
     public static final  String          SIMULATE_GREEDY_VS_RANDOM      = "SimulateGreedyVsRandom";
     public static final  String          SIMULATE_GREEDY_VS_TRAINED     = "SimulateGreedyVsTrained";
     public static final  String          SIMULATE_LAZY                  = "SimulateLazy";
-    public static final  String          SIMULATE_LAZY_VS_INITIAL       = "SimulateLazyVsInitial";
-    public static final  String          SIMULATE_RANDOM                = "SimulateRandom";
-    public static final  String          SIMULATE_RANDOM_VS_GREEDY      = "SimulateRandomVsGreedy";
-    public static final  String          SIMULATE_RANDOM_VS_INITIAL     = "SimulateRandomVsInitial";
-    public static final  String          SIMULATE_RANDOM_VS_LAZY        = "SimulateRandomVsLazy";
-    public static final  String          SIMULATE_RANDOM_VS_TRAINED     = "SimulateRandomVsTrained";
-    public static final  String          TRAINED_VS_HUMAN               = "TrainedVsHuman";
-    public static final  String          TRAIN_VS_GREEDY                = "TrainVsGreedy";
-    public static final  String          TRAIN_VS_RANDOM                = "TrainVsRandom";
-    public static final  String          USAGE                          =
+    public static final String SIMULATE_LAZY_VS_INITIAL   = "SimulateLazyVsInitial";
+    public static final String SIMULATE_RANDOM            = "SimulateRandom";
+    public static final String SIMULATE_RANDOM_VS_GREEDY  = "SimulateRandomVsGreedy";
+    public static final String SIMULATE_RANDOM_VS_INITIAL = "SimulateRandomVsInitial";
+    public static final String SIMULATE_RANDOM_VS_LAZY    = "SimulateRandomVsLazy";
+    public static final String SIMULATE_RANDOM_VS_TRAINED = "SimulateRandomVsTrained";
+    public static final String SIMULATE_TRAINED           = "SimulateTrained";
+    public static final String TRAINED_VS_HUMAN           = "TrainedVsHuman";
+    public static final String TRAIN_ALONE                = "TrainAlone";
+    public static final String TRAIN_VS_GREEDY            = "TrainVsGreedy";
+    public static final String TRAIN_VS_RANDOM            = "TrainVsRandom";
+    public static final String USAGE                      =
             "Usage: ./pig [(Humans)|(HumanVsRandom (1|2))|(TrainedVsHuman \"number\")|(TrainRandom \"number\")|(TrainVsGreedy \"number\")|" +
             "(SimulateGreedy \"number\")|(SimulateGreedyVsInitial \"number\")|(SimulateGreedyVsLazy \"number\")|(SimulateGreedyVsRandom \"number\")" +
             "|(SimulateGreedyVsTrained \"number\")|(SimulateLazy \"number\")|(SimulateLazyVsInitial \"number\")|(SimulateRandom \"number\")|" +
@@ -189,12 +191,34 @@ class Game
                     throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_RANDOM_VS_TRAINED + " \"number\"");
                 }
                 break;
+            case SIMULATE_TRAINED:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig = new Game(PlayerType.PERCEPTRON, PlayerType.PERCEPTRON, config);
+                    config.loadTrainedPerceptron();
+                    simulate(pig, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + SIMULATE_TRAINED + " \"number\"");
+                }
+                break;
             case CREATE_LAZY_PERCEPTRON:
                 try {
                     config.initPerceptronToTrain();
                     config.getEncogInterface().setWeight(1, 0, FIRST_DICES_TO_ROLL_INDEX, LAZY_PERCEPTRON_INITIAL_WEIGHT);
                     config.saveLazyNeuralNetwork();
                 } catch ( final Exception e ) {
+                    e.printStackTrace();
+                }
+                break;
+            case TRAIN_ALONE:
+                try {
+                    gamesToPlay = Integer.parseInt(args[1]);
+                    pig = new Game(PlayerType.PERCEPTRON, PlayerType.PERCEPTRON, config);
+                    config.initPerceptronToTrain();
+                    train(config, pig, gamesToPlay);
+                } catch ( final NumberFormatException ignored ) {
+                    throw new IllegalArgumentException("Unknown games to play. Usage: ./pig " + TRAIN_ALONE + " \"number\"");
+                } catch ( final IOException e ) {
                     e.printStackTrace();
                 }
                 break;
