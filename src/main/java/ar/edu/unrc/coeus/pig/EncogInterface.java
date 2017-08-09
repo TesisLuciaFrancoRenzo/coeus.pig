@@ -71,6 +71,7 @@ class EncogInterface
         this.hasBias = hasBias;
         this.neuronQuantityInLayer = neuronQuantityInLayer;
         this.concurrentInput = concurrentInput;
+        //Inicializamos funciones de activación
         for ( final ActivationFunction activationFunctionForEncog : encogActivationFunctions ) {
             if ( activationFunctionForEncog instanceof ActivationTANH ) {
                 activationFunction.add(FunctionUtils.TANH);
@@ -85,6 +86,7 @@ class EncogInterface
                 throw new IllegalArgumentException("El test esta pensado para utilizar TANH, Sigmoid o Linear como función de activación");
             }
         }
+        //Inicializamos la normalización de la salida
         normOutput = new NormalizedField(NormalizationAction.Normalize, null, maxReward, minReward, activationFunctionMax, activationFunctionMin);
     }
 

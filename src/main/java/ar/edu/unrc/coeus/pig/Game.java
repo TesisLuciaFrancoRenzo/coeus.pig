@@ -49,31 +49,31 @@ class Game
     public static final  String          CREATE_LAZY_PERCEPTRON         = "CreateLazyPerceptron";
     public static final  int             FIRST_DICES_TO_ROLL_INDEX      = 0;
     public static final  String          HUMANS                         = "Humans";
-    public static final  String          HUMAN_VS_RANDOM                = "HumanVsRandom";
-    public static final  double          LAZY_PERCEPTRON_INITIAL_WEIGHT = 0.1d;
-    public static final  int             MAX_DICES_TO_ROLL              = 10;
-    public static final  int             INPUT_NEURONS                  = MAX_DICES_TO_ROLL;
-    public static final  int             MAX_SCORE                      = 159;
-    public static final  int             MAX_TOTAL_REWARD               = 250;
-    public static final String SIMULATE_GREEDY            = "SimulateGreedy";
-    public static final String SIMULATE_GREEDY_VS_INITIAL = "SimulateGreedyVsInitial";
-    public static final String SIMULATE_GREEDY_VS_LAZY    = "SimulateGreedyVsLazy";
-    public static final String SIMULATE_GREEDY_VS_RANDOM  = "SimulateGreedyVsRandom";
-    public static final String SIMULATE_GREEDY_VS_TRAINED = "SimulateGreedyVsTrained";
-    public static final String SIMULATE_LAZY              = "SimulateLazy";
-    public static final String SIMULATE_LAZY_VS_INITIAL   = "SimulateLazyVsInitial";
-    public static final String SIMULATE_LAZY_VS_TRAINED   = "SimulateLazyVsTrained";
-    public static final String SIMULATE_RANDOM            = "SimulateRandom";
-    public static final String SIMULATE_RANDOM_VS_GREEDY  = "SimulateRandomVsGreedy";
-    public static final String SIMULATE_RANDOM_VS_INITIAL = "SimulateRandomVsInitial";
-    public static final String SIMULATE_RANDOM_VS_LAZY    = "SimulateRandomVsLazy";
-    public static final String SIMULATE_RANDOM_VS_TRAINED = "SimulateRandomVsTrained";
-    public static final String SIMULATE_TRAINED           = "SimulateTrained";
-    public static final String TRAINED_VS_HUMAN           = "TrainedVsHuman";
-    public static final String TRAIN_ALONE                = "TrainAlone";
-    public static final String TRAIN_VS_GREEDY            = "TrainVsGreedy";
-    public static final String TRAIN_VS_RANDOM            = "TrainVsRandom";
-    public static final String USAGE                      =
+    public static final String HUMAN_VS_RANDOM                = "HumanVsRandom";
+    public static final double LAZY_PERCEPTRON_INITIAL_WEIGHT = 0.1d;
+    public static final int    MAX_DICES_TO_ROLL              = 10;
+    public static final int    INPUT_NEURONS                  = MAX_DICES_TO_ROLL;
+    public static final int    MAX_SCORE                      = 159;
+    public static final int    MAX_TOTAL_REWARD               = 250;
+    public static final String SIMULATE_GREEDY                = "SimulateGreedy";
+    public static final String SIMULATE_GREEDY_VS_INITIAL     = "SimulateGreedyVsInitial";
+    public static final String SIMULATE_GREEDY_VS_LAZY        = "SimulateGreedyVsLazy";
+    public static final String SIMULATE_GREEDY_VS_RANDOM      = "SimulateGreedyVsRandom";
+    public static final String SIMULATE_GREEDY_VS_TRAINED     = "SimulateGreedyVsTrained";
+    public static final String SIMULATE_LAZY                  = "SimulateLazy";
+    public static final String SIMULATE_LAZY_VS_INITIAL       = "SimulateLazyVsInitial";
+    public static final String SIMULATE_LAZY_VS_TRAINED       = "SimulateLazyVsTrained";
+    public static final String SIMULATE_RANDOM                = "SimulateRandom";
+    public static final String SIMULATE_RANDOM_VS_GREEDY      = "SimulateRandomVsGreedy";
+    public static final String SIMULATE_RANDOM_VS_INITIAL     = "SimulateRandomVsInitial";
+    public static final String SIMULATE_RANDOM_VS_LAZY        = "SimulateRandomVsLazy";
+    public static final String SIMULATE_RANDOM_VS_TRAINED     = "SimulateRandomVsTrained";
+    public static final String SIMULATE_TRAINED               = "SimulateTrained";
+    public static final String TRAINED_VS_HUMAN               = "TrainedVsHuman";
+    public static final String TRAIN_ALONE                    = "TrainAlone";
+    public static final String TRAIN_VS_GREEDY                = "TrainVsGreedy";
+    public static final String TRAIN_VS_RANDOM                = "TrainVsRandom";
+    public static final String USAGE                          =
             "Usage: ./pig [(Humans)|(HumanVsRandom (1|2))|(TrainedVsHuman \"number\")|(TrainRandom \"number\")|(TrainVsGreedy \"number\")|" +
             "(SimulateGreedy \"number\")|(SimulateGreedyVsInitial \"number\")|(SimulateGreedyVsLazy \"number\")|(SimulateGreedyVsRandom \"number\")" +
             "|(SimulateGreedyVsTrained \"number\")|(SimulateLazy \"number\")|(SimulateLazyVsInitial \"number\")|(SimulateRandom \"number\")|" +
@@ -396,8 +396,10 @@ class Game
     }
 
     /**
-     * @param pig
-     * @param gamesToPlay cantidad de veces que se juega como cada jugador (gamesToPlay = veces jugada como jugador 1 + veces jugadas como jugador 2)
+     * Entrena un perceptrón inicializado en Pig, gamesToPlay cantidad de veces.
+     *
+     * @param pig         juego con un perceptrón inicializado.
+     * @param gamesToPlay cantidad de veces que se juega.
      */
     private static
     void simulate(
@@ -428,10 +430,11 @@ class Game
     }
 
     /**
+     * Ejemplo de como invocar Coeus para que entrene un perceptron.
+     *
      * @param perceptronConfiguration
-     * @param pig
-     * @param gamesToPlay             cantidad de veces que se juega como cada jugador (gamesToPlay = veces jugada como jugador 1 + veces jugadas como
-     *                                jugador 2)
+     * @param pig                     juego inicializado
+     * @param gamesToPlay             cantidad de veces que se juega
      *
      * @throws IOException
      */
@@ -527,7 +530,7 @@ class Game
             finalGameState.addPlayer1TotalReward(finalGameState.getDicesToRoll());
             finalGameState.addPlayer1Score(rollDices(finalGameState.getDicesToRoll(), random, false));
             if ( !finalGameState.isTerminalState() ) {
-                finalGameState.swapPlayers(); //TODO va final State?
+                finalGameState.swapPlayers();
             }
         }
         return finalGameState;

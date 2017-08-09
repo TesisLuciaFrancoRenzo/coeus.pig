@@ -33,7 +33,7 @@ class GameState
         implements IStatePerceptron {
 
     /**
-     * Usad para saber cuantos dados hay que tirar. También dados Es usado como recompensa parcial.
+     * Usad para saber cuántos dados hay que tirar. También dados Es usado como recompensa parcial.
      */
     private int     dicesToRoll;
     private boolean isPlayer1Turn;
