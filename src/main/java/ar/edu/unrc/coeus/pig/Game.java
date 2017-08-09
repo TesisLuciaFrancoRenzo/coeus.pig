@@ -46,9 +46,9 @@ import java.util.stream.IntStream;
 public
 class Game
         implements IProblemToTrain {
-    public static final  String          CREATE_LAZY_PERCEPTRON         = "CreateLazyPerceptron";
-    public static final  int             FIRST_DICES_TO_ROLL_INDEX      = 0;
-    public static final  String          HUMANS                         = "Humans";
+    public static final String CREATE_LAZY_PERCEPTRON         = "CreateLazyPerceptron";
+    public static final int    FIRST_DICES_TO_ROLL_INDEX      = 0;
+    public static final String HUMANS                         = "Humans";
     public static final String HUMAN_VS_RANDOM                = "HumanVsRandom";
     public static final double LAZY_PERCEPTRON_INITIAL_WEIGHT = 0.1d;
     public static final int    MAX_DICES_TO_ROLL              = 10;
@@ -454,8 +454,9 @@ class Game
                 perceptronConfiguration.getConcurrencyInLayer(),
                 new Random(),
                 perceptronConfiguration.isCollectStatistics());
-        learningAlgorithm.setAnnealingLearningRate(25_000);
+        learningAlgorithm.setAnnealingLearningRate(10_000);
         learningAlgorithm.setLinearExplorationRate(0.1, 5_000, 0, 10_000);
+        long time = System.currentTimeMillis();
         for ( int i = 1; i <= gamesToPlay; i++ ) {
             learningAlgorithm.solveAndTrainOnce(pig, i);
             if ( ( i % ( gamesToPlay / 100 ) ) == 0 ) {
@@ -463,8 +464,9 @@ class Game
                 System.out.println(new Date() + " - " + percent + " %");
             }
         }
+        time = System.currentTimeMillis() - time;
         perceptronConfiguration.saveTrainedNeuralNetwork();
-        System.out.println(new Date() + " => Training Finished.");
+        System.out.println(new Date() + " => Training Finished. Time: " + time + "ms.");
     }
 
     /**
@@ -573,6 +575,8 @@ class Game
     @Override
     public
     IState initialize() {
+        // Al jugar siempre como jugador 2, el turno inicial del juego para entrenar debe
+        // ajustarse simulando el primer jugador
         currentGameState.reset();
         assert currentGameState.isPlayer1Turn();
         currentGameState.setDicesToRoll(player1Brain.apply(currentGameState));
@@ -585,6 +589,7 @@ class Game
     @Override
     public
     List< IAction > listAllPossibleActions( final IState turnInitialState ) {
+        //Las acciones a elegir siempre son las mismas sin importar el turno y el estado del juego
         return LIST_OF_ALL_POSSIBLE_ACTIONS;
     }
 
