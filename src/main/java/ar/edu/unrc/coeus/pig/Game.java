@@ -432,11 +432,11 @@ class Game
     /**
      * Ejemplo de como invocar Coeus para que entrene un perceptron.
      *
-     * @param perceptronConfiguration
+     * @param perceptronConfiguration configuración
      * @param pig                     juego inicializado
      * @param gamesToPlay             cantidad de veces que se juega
      *
-     * @throws IOException
+     * @throws IOException error al leer o escribir archivos del perceptrón.
      */
     private static
     void train(
