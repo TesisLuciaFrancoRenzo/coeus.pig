@@ -605,7 +605,7 @@ class Game
     private
     void play( final boolean show ) {
         if ( show ) {
-            System.out.println("Hola Jugamos al Game!!!");
+            System.out.println("Hola, Juguemos al Easy PIG!!!");
         }
         final Random random = new Random();
         random.setSeed(System.currentTimeMillis());

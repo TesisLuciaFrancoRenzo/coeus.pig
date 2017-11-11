@@ -31,12 +31,27 @@ usar.
 - `gradlew javadoc`:  compila javadoc.
 
 ## Instrucciones de uso
-`java -jar coeus.pig-1.0.0.jar`
-
-- Las flechas del teclado mueven las fichas del tablero en la dirección deseada.
-- La barra espaciadora hace que juegue la IA en el turno actual.
-- Si se deja presionada la barra espaciadora, juega continuamente la IA.
-- Utilizar el mouse para interactuar con el menu.
+`java -jar coeus.pig-1.0.0.jar [parameter]`
+donde los parámetros pueden ser:
+- Humans: Juega humano vs humano.
+- SimulateGreedy: Calcula estadísticas utilizando una IA Greedy.
+- SimulateGreedyVsInitial: Calcula estadísticas utilizando una IA Greedy vs una IA sin entrenar.
+- SimulateGreedyVsLazy: Calcula estadísticas utilizando una IA Greedy vs una IA Lazy.
+- SimulateGreedyVsRandom: Calcula estadísticas utilizando una IA Greedy vs una IA Random.
+- SimulateGreedyVsTrained: Calcula estadísticas utilizando una IA Greedy vs una IA entrenada.
+- SimulateLazy: Calcula estadísticas utilizando una IA Lazy.
+- SimulateLazyVsInitial: Calcula estadísticas utilizando una IA Lazy vs una IA sin entrenar. 
+- SimulateLazyVsTrained: Calcula estadísticas utilizando una IA Lazy vs una IA entrenada.
+- SimulateRandom: Calcula estadísticas utilizando una IA Random.
+- SimulateRandomVsGreedy: Calcula estadísticas utilizando una IA Random vs una IA Greedy.
+- SimulateRandomVsInitial: Calcula estadísticas utilizando una IA Random vs una IA sin entrenar.
+- SimulateRandomVsLazy: Calcula estadísticas utilizando una IA Random vs una IA Lazy.
+- SimulateRandomVsTrained: Calcula estadísticas utilizando una IA Random vs una IA entrenada.
+- SimulateTrained: Calcula estadísticas utilizando una IA Entrenada vs sí misma.
+- TrainedVsHuman: Juega una IA entrenada vs un Humano 
+- TrainAlone: Entrena una IA vs sí misma.
+- TrainVsGreedy: Entrena una IA vs una IA Greedy.
+- TrainVsRandom: Entrena una IA vs una IA Random.
 
 ## Licencia
 [![GNU GPL v3.0](http://www.gnu.org/graphics/gplv3-127x51.png)](http://www.gnu.org/licenses/gpl.html)
