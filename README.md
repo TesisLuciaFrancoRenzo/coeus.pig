@@ -33,25 +33,28 @@ usar.
 ## Instrucciones de uso
 `java -jar coeus.pig-1.0.0.jar [parameter]`
 donde los parámetros pueden ser:
-- Humans: Juega humano vs humano.
-- SimulateGreedy: Calcula estadísticas utilizando una IA Greedy.
-- SimulateGreedyVsInitial: Calcula estadísticas utilizando una IA Greedy vs una IA sin entrenar.
-- SimulateGreedyVsLazy: Calcula estadísticas utilizando una IA Greedy vs una IA Lazy.
-- SimulateGreedyVsRandom: Calcula estadísticas utilizando una IA Greedy vs una IA Random.
-- SimulateGreedyVsTrained: Calcula estadísticas utilizando una IA Greedy vs una IA entrenada.
-- SimulateLazy: Calcula estadísticas utilizando una IA Lazy.
-- SimulateLazyVsInitial: Calcula estadísticas utilizando una IA Lazy vs una IA sin entrenar. 
-- SimulateLazyVsTrained: Calcula estadísticas utilizando una IA Lazy vs una IA entrenada.
-- SimulateRandom: Calcula estadísticas utilizando una IA Random.
-- SimulateRandomVsGreedy: Calcula estadísticas utilizando una IA Random vs una IA Greedy.
-- SimulateRandomVsInitial: Calcula estadísticas utilizando una IA Random vs una IA sin entrenar.
-- SimulateRandomVsLazy: Calcula estadísticas utilizando una IA Random vs una IA Lazy.
-- SimulateRandomVsTrained: Calcula estadísticas utilizando una IA Random vs una IA entrenada.
-- SimulateTrained: Calcula estadísticas utilizando una IA Entrenada vs sí misma.
-- TrainedVsHuman: Juega una IA entrenada vs un Humano 
-- TrainAlone: Entrena una IA vs sí misma.
-- TrainVsGreedy: Entrena una IA vs una IA Greedy.
-- TrainVsRandom: Entrena una IA vs una IA Random.
+- `Humans`: Juega Humano vs Humano.
+- `HumanVsRandom (1|2)`: Juega Humano vs IA Random.
+- `SimulateGreedy (number)`: Calcula estadísticas utilizando una IA Greedy.
+- `SimulateGreedyVsInitial (number)`: Calcula estadísticas utilizando una IA Greedy vs una IA sin entrenar.
+- `SimulateGreedyVsLazy (number)`: Calcula estadísticas utilizando una IA Greedy vs una IA Lazy.
+- `SimulateGreedyVsRandom (number)`: Calcula estadísticas utilizando una IA Greedy vs una IA Random.
+- `SimulateGreedyVsTrained (number)`: Calcula estadísticas utilizando una IA Greedy vs una IA entrenada.
+- `SimulateLazy (number)`: Calcula estadísticas utilizando una IA Lazy.
+- `SimulateLazyVsInitial (number)`: Calcula estadísticas utilizando una IA Lazy vs una IA sin entrenar. 
+- `SimulateLazyVsTrained (number)`: Calcula estadísticas utilizando una IA Lazy vs una IA entrenada.
+- `SimulateRandom (number)`: Calcula estadísticas utilizando una IA Random.
+- `SimulateRandomVsGreedy (number)`: Calcula estadísticas utilizando una IA Random vs una IA Greedy.
+- `SimulateRandomVsInitial (number)`: Calcula estadísticas utilizando una IA Random vs una IA sin entrenar.
+- `SimulateRandomVsLazy (number)`: Calcula estadísticas utilizando una IA Random vs una IA Lazy.
+- `SimulateRandomVsTrained (number)`: Calcula estadísticas utilizando una IA Random vs una IA entrenada.
+- `SimulateTrained (number)`: Calcula estadísticas utilizando una IA Entrenada vs sí misma.
+- `TrainedVsHuman (number)`: Juega una IA entrenada vs un Humano 
+- `TrainAlone (number)`: Entrena una IA vs sí misma.
+- `TrainVsGreedy (number)`: Entrena una IA vs una IA Greedy.
+- `TrainVsRandom (number)`: Entrena una IA vs una IA Random.
+
+Donde `(number)` es la cantidad de partidas a jugar.
 
 ## Licencia
 [![GNU GPL v3.0](http://www.gnu.org/graphics/gplv3-127x51.png)](http://www.gnu.org/licenses/gpl.html)
