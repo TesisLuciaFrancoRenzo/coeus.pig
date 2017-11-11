@@ -49,7 +49,7 @@ donde los parámetros pueden ser:
 - `SimulateRandomVsLazy (number)`: Calcula estadísticas utilizando una IA Random vs una IA Lazy.
 - `SimulateRandomVsTrained (number)`: Calcula estadísticas utilizando una IA Random vs una IA entrenada.
 - `SimulateTrained (number)`: Calcula estadísticas utilizando una IA Entrenada vs sí misma.
-- `TrainedVsHuman (number)`: Juega una IA entrenada vs un Humano 
+- `TrainedVsHuman`: Juega una IA entrenada vs un Humano 
 - `TrainAlone (number)`: Entrena una IA vs sí misma.
 - `TrainVsGreedy (number)`: Entrena una IA vs una IA Greedy.
 - `TrainVsRandom (number)`: Entrena una IA vs una IA Random.

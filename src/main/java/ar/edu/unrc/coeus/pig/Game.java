@@ -74,7 +74,7 @@ class Game
     public static final  String          TRAIN_VS_GREEDY                = "TrainVsGreedy";
     public static final  String          TRAIN_VS_RANDOM                = "TrainVsRandom";
     public static final  String          USAGE                          =
-            "Usage: ./pig [(Humans)|(HumanVsRandom (1|2))|(TrainedVsHuman \"number\")|(TrainRandom \"number\")|(TrainVsGreedy \"number\")|" +
+            "Usage: ./pig [(Humans)|(HumanVsRandom (1|2))|(TrainedVsHuman)|(TrainRandom \"number\")|(TrainVsGreedy \"number\")|" +
             "(SimulateGreedy \"number\")|(SimulateGreedyVsInitial \"number\")|(SimulateGreedyVsLazy \"number\")|(SimulateGreedyVsRandom \"number\")" +
             "|(SimulateGreedyVsTrained \"number\")|(SimulateLazy \"number\")|(SimulateLazyVsInitial \"number\")|(SimulateRandom \"number\")|" +
             "(SimulateRandomVsGreedy \"number\")|(SimulateRandomVsInitial \"number\")|(SimulateRandomVsLazy \"number\")|(SimulateRandomVsTrained " +
