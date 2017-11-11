@@ -2,7 +2,7 @@
 	<img src="https://i.imgur.com/rqOh0KW.png" alt="IA">
 </h1>
 
-# Caso de estudio: Easy Pig enrenado por Coeus
+# Caso de estudio: Easy Pig entrenado por Coeus
 Este proyecto es un caso de prueba de la librería [Coeus](https://github.com/TesisLuciaFrancoRenzo/coeus) 
 en la cual se configuro para aprender a usar la misma de una forma didáctica. 
 Para mas detalles referirse al [Informe](https://docs.google.com/document/d/1arNnKmmV7xc9qDrgPNbtxQXO8b81HknmJQKCshfAzUU/edit?usp=sharing) del mismo. 

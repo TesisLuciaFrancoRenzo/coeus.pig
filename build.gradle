@@ -44,3 +44,27 @@ allprojects {
     }
 }
 
+mainClassName = "ar.edu.unrc.coeus.pig.Game"
+
+//create a single Jar with all dependencies
+task finalFatJar(type: Jar) {
+    manifest {
+        attributes('Implementation-Title': rootProject.name,
+                'Application-Name': 'Easy Pig',
+                'Implementation-Version': version,
+                'Built-By': 'Lucia Bressan, Renzo Bianchini, Franco Gastón Pellegrini',
+                'Built-Date': new Date(),
+                'Built-Java': System.getProperty('java.version'),
+                'Main-Class': mainClassName,
+                'Sealed': 'true')
+    }
+    baseName = project.name
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+configure(finalFatJar) {
+    group = 'distribution'
+    description = 'Create a big Jar with all dependency'
+}
+
