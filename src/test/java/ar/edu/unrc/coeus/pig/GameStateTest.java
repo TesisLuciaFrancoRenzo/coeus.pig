@@ -1,10 +1,11 @@
 package ar.edu.unrc.coeus.pig;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ar.edu.unrc.coeus.pig.Game.*;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public
 class GameStateTest {
@@ -27,7 +28,7 @@ class GameStateTest {
             }
         }
         if ( count != NEURONS_TO_ACTIVATE ) {
-            Assert.fail("No hay " + NEURONS_TO_ACTIVATE + " neuronas activas como input, hay : " + count + ". Estado = " + state);
+            fail("No hay " + NEURONS_TO_ACTIVATE + " neuronas activas como input, hay : " + count + ". Estado = " + state);
         }
     }
 
@@ -35,9 +36,9 @@ class GameStateTest {
     public final
     void lazyPerceptron() {
         final GameState state = new GameState(1, true, 0, 0, 0, 0);
-        Assert.assertThat(state.translateToPerceptronInput(FIRST_DICES_TO_ROLL_INDEX), equalTo(1.0d));
-        Assert.assertThat(state.translateToPerceptronInput(FIRST_DICES_TO_ROLL_INDEX - 1), equalTo(0.0d));
-        Assert.assertThat(state.translateToPerceptronInput(FIRST_DICES_TO_ROLL_INDEX + 1), equalTo(0.0d));
+        assertThat(state.translateToPerceptronInput(FIRST_DICES_TO_ROLL_INDEX), equalTo(1.0d));
+        assertThat(state.translateToPerceptronInput(FIRST_DICES_TO_ROLL_INDEX - 1), equalTo(0.0d));
+        assertThat(state.translateToPerceptronInput(FIRST_DICES_TO_ROLL_INDEX + 1), equalTo(0.0d));
     }
 
     @SuppressWarnings( "JUnitTestMethodWithNoAssertions" )
